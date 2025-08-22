@@ -48,7 +48,7 @@ const Navbar = () => {
   return (
     <div className='relative'>
       {/* Main Navbar */}
-      <div className='h-16 flex bg-black items-center justify-around sm:px-4 text-white'>
+      <div className='h-16 flex bg-black border-b-[1px] border-b-white items-center justify-around sm:px-4 text-white'>
         {/* Logo */}
         <div>
           <Image
@@ -114,7 +114,7 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden absolute top-16 left-0 right-0 bg-black border-t border-gray-800 transition-all duration-300 ease-in-out ${
+        className={`md:hidden absolute top-16 left-0 right-0 bg-black border-t border-gray-800 transition-all duration-300 ease-in-out z-50 ${
           isMenuOpen
             ? 'opacity-100 visible transform translate-y-0'
             : 'opacity-0 invisible transform -translate-y-4'
