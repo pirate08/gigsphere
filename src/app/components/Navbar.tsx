@@ -1,7 +1,7 @@
 'use client';
 
 import Image from 'next/image';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 interface NavItem {
@@ -36,6 +36,7 @@ const NavItems: NavItem[] = [
 
 const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isScrolled, setIsScrolled] = useState(false);
 
   const toggleMenu = () => {
     setIsMenuOpen(!isMenuOpen);
@@ -45,18 +46,36 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  // Handle scroll effect
+  useEffect(() => {
+    const handleScroll = () => {
+      const scrollPosition = window.scrollY;
+      setIsScrolled(scrollPosition > 50);
+    };
+
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
   return (
     <div className='relative'>
-      {/* Main Navbar */}
-      <div className='h-16 flex bg-black border-b-[1px] border-b-white items-center justify-around sm:px-4 text-white'>
+      {/* Main Navbar - Now Fixed */}
+      <div
+        className={`fixed top-0 left-0 right-0 z-50 h-16 flex items-center justify-around sm:px-4 text-white transition-all duration-300 ${
+          isScrolled
+            ? 'bg-black/95 backdrop-blur-md border-b border-white/20 shadow-lg'
+            : 'bg-black border-b-[1px] border-b-white'
+        }`}>
         {/* Logo */}
-        <div>
+        <div className='flex-shrink-0'>
           <Image
             src='/main-logo-removebg.png'
             alt='logo'
             width={200}
             height={150}
-            // className='w-auto h-10 sm:h-12'
+            className={`transition-all duration-300 ${
+              isScrolled ? 'scale-90' : 'scale-100'
+            }`}
           />
         </div>
 
@@ -114,7 +133,11 @@ const Navbar = () => {
 
       {/* Mobile Menu */}
       <div
-        className={`md:hidden absolute top-16 left-0 right-0 bg-black border-t border-gray-800 transition-all duration-300 ease-in-out z-50 ${
+        className={`md:hidden fixed top-16 left-0 right-0 z-40 transition-all duration-300 ease-in-out ${
+          isScrolled
+            ? 'bg-black/95 backdrop-blur-md border-t border-white/20'
+            : 'bg-black border-t border-gray-800'
+        } ${
           isMenuOpen
             ? 'opacity-100 visible transform translate-y-0'
             : 'opacity-0 invisible transform -translate-y-4'
@@ -148,10 +171,13 @@ const Navbar = () => {
       {/* Mobile Menu Overlay */}
       {isMenuOpen && (
         <div
-          className='md:hidden fixed inset-0 bg-black bg-opacity-50 z-[-1]'
+          className='md:hidden fixed inset-0 bg-black bg-opacity-50 z-30'
           onClick={closeMenu}
         />
       )}
+
+      {/* Spacer div to prevent content from hiding behind fixed navbar */}
+      <div className='h-16'></div>
     </div>
   );
 };
