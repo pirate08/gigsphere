@@ -8,6 +8,11 @@
     rgba(67, 126, 171, 1) 18%,
     rgba(4, 94, 28, 1) 74%
   );
+  --deep-colour: linear-gradient(
+    90deg,
+    rgba(18, 19, 38, 1) 47%,
+    rgba(25, 36, 21, 1) 74%
+  );
 }
 
 @theme inline {
@@ -35,5 +40,9 @@ body {
 
   .button-gradient:hover {
     filter: brightness(80%);
+  }
+
+  .deep-colour {
+    background: var(--deep-colour);
   }
 }
