@@ -88,7 +88,7 @@ const Testimonal = () => {
   const currentItem = sliderDetails[currentIndex];
 
   return (
-    <div className='w-full min-h-screen deep-colour py-12 sm:py-16 lg:py-20'>
+    <div className='w-full min-h-screen deep-colour py-12 sm:py-16 lg:py-20 px-4'>
       {/* Header Section */}
       <div className='text-center mb-12 sm:mb-16 lg:mb-20'>
         <h2 className='text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4 sm:mb-6'>
