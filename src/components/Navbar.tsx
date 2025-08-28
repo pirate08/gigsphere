@@ -14,21 +14,26 @@ interface NavItem {
 const NavItems: NavItem[] = [
   {
     id: 1,
+    title: 'Home',
+    link: '/',
+  },
+  {
+    id: 2,
     title: 'Find Work',
     link: '/find-work',
   },
   {
-    id: 2,
+    id: 3,
     title: 'Find Freelancers',
     link: '/find-freelancers',
   },
   {
-    id: 3,
+    id: 4,
     title: 'How It Works',
     link: '/how-it-works',
   },
   {
-    id: 4,
+    id: 5,
     title: 'Resources',
     link: '/resources',
   },
