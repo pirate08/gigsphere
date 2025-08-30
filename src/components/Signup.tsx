@@ -3,13 +3,13 @@
 import Image from 'next/image';
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { FaGoogle, FaShoppingBag, FaEye, FaEyeSlash } from 'react-icons/fa';
-import { BsPeopleFill } from 'react-icons/bs';
+import { FaGoogle, FaEye, FaEyeSlash } from 'react-icons/fa';
+import FormInput from '../ui/FormInput';
+import RoleSelection from '../ui/RoleSection';
+import { useRouter } from 'next/router';
+
 
 const Signup = () => {
-  const [selectedRole, setSelectedRole] = useState<
-    'freelancer' | 'client' | null
-  >(null);
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
     useState<boolean>(false);
@@ -104,77 +104,31 @@ const Signup = () => {
           {/* --Form-- */}
           <form className='flex flex-col gap-5 text-left'>
             {/* --Name-- */}
-            <div className='flex flex-col'>
-              <label
-                className='text-sm text-gray-600 font-medium'
-                htmlFor='name'>
-                Full Name
-              </label>
-              <input
-                id='name'
-                type='text'
-                placeholder='Enter your full name'
-                className='mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              />
-            </div>
+            <FormInput
+              label='Full Name'
+              id='name'
+              type='text'
+              name='name'
+              placeholder='Enter your full name'
+              value={''}
+              onChange={() => {}}
+              required={true}
+            />
             {/* --Email-- */}
-            <div className='flex flex-col'>
-              <label
-                className='text-sm text-gray-600 font-medium'
-                htmlFor='email'>
-                Email Address
-              </label>
-              <input
-                id='email'
-                type='email'
-                placeholder='Enter your email address'
-                className='mt-1 p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500'
-              />
-            </div>
+            <FormInput
+              label='Email Address'
+              id='email'
+              type='email'
+              name='email'
+              placeholder='Enter your email address'
+              value={''}
+              onChange={() => {}}
+            />
             {/* --Role-- */}
-            <div className='flex flex-col gap-2'>
-              <label
-                className='text-sm text-gray-600 font-medium'
-                htmlFor='role'>
-                I want to:
-              </label>
-              <div className='flex flex-col sm:flex-row gap-4'>
-                <div
-                  className={`flex-1 px-4 py-3 border rounded-md cursor-pointer transition-colors duration-200 ${
-                    selectedRole === 'client'
-                      ? 'border-blue-500 ring-2 ring-blue-500'
-                      : 'border-gray-300'
-                  }`}
-                  onClick={() => setSelectedRole('client')}>
-                  <div className='flex flex-col items-center justify-center gap-2'>
-                    <FaShoppingBag className='text-2xl text-blue-500' />
-                    <h3 className='font-semibold text-sm text-gray-800 text-center'>
-                      Hire Freelancers
-                    </h3>
-                    <p className='text-xs text-gray-500 text-center'>
-                      I'm a client looking for talent
-                    </p>
-                  </div>
-                </div>
-                <div
-                  className={`flex-1 px-4 py-3 border rounded-md cursor-pointer transition-colors duration-200 ${
-                    selectedRole === 'freelancer'
-                      ? 'border-green-500 ring-2 ring-green-500'
-                      : 'border-gray-300'
-                  }`}
-                  onClick={() => setSelectedRole('freelancer')}>
-                  <div className='flex flex-col items-center justify-center gap-2'>
-                    <BsPeopleFill className='text-2xl text-green-500' />
-                    <h3 className='font-semibold text-sm text-gray-800 text-center'>
-                      Find Work
-                    </h3>
-                    <p className='text-xs text-gray-500 text-center'>
-                      I'm a freelancer seeking jobs
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
+            <RoleSelection
+              selectedRole={'freelancer'}
+              onSelectRole={() => {}}
+            />
 
             {/* --Password section-- */}
             <div className='flex flex-col md:flex-row w-full gap-3'>
@@ -195,7 +149,7 @@ const Signup = () => {
                   <span
                     className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer'
                     onClick={togglePasswordVisibility}>
-                    {showPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showPassword ? <FaEye /> : <FaEyeSlash />}
                   </span>
                 </div>
               </div>
@@ -216,7 +170,7 @@ const Signup = () => {
                   <span
                     className='absolute inset-y-0 right-0 flex items-center pr-3 text-gray-500 cursor-pointer'
                     onClick={toggleConfirmPasswordVisibility}>
-                    {showConfirmPassword ? <FaEyeSlash /> : <FaEye />}
+                    {showConfirmPassword ? <FaEye /> : <FaEyeSlash />}
                   </span>
                 </div>
               </div>
