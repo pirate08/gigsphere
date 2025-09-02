@@ -54,6 +54,9 @@ const Login = () => {
 
       // Success: Storing the token and redirect
       if (response.ok) {
+        toast.success('Login successful!...', {
+          duration: 4000,
+        });
         setCookie('user_token', data.token, { maxAge: 60 * 60 * 24 * 7 });
         setCookie('user_role', data.role, { maxAge: 60 * 60 * 24 * 7 });
 
