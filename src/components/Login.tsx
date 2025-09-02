@@ -35,7 +35,7 @@ const Login = () => {
       </div>
 
       {/* --SignIn Container-- */}
-      <div className='relative z-10 w-full md:max-w-5xl max-w-md h-full md:h-[600px] rounded-xl shadow-lg border border-gray-700 bg-gray-800/60 flex flex-col md:flex-row overflow-hidden backdrop-blur-md'>
+      <div className='relative z-10 w-full md:max-w-5xl max-w-md h-full md:h-[600px] rounded-xl shadow-lg border border-gray-700 bg-gray-900/30 flex flex-col md:flex-row overflow-hidden backdrop-blur-md'>
         {/* --Left Side Card-- */}
         <SigninLeftCard />
 
