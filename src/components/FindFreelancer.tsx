@@ -1,5 +1,4 @@
 import FindFreelancerHero from '@/ui/FindFreelancerHero';
-import Image from 'next/image';
 import React from 'react';
 
 const FindFreelancer = () => {
