@@ -1,22 +1,26 @@
 import Image from 'next/image';
+import Link from 'next/link';
 import React from 'react';
 
 interface HeroProps {
   image: string;
   title: string;
   paragraph: string;
+  link: string;
+  button: string;
 }
 
 const FindFreelancerHero: React.FC<HeroProps> = ({
   image,
   title,
   paragraph,
+  link,
+  button,
 }) => {
   return (
-    <div className='relative w-full h-[600px]'>
-      {/* <-- Fixed Height Added Here */}
+    <div className='relative w-full h-screen'>
       {/* --Image Section-- */}
-      <div className='absolute inset-0 w-full h-[600px]'>
+      <div className='absolute inset-0 w-full h-screen'>
         <Image
           src={image}
           alt={title}
@@ -28,13 +32,21 @@ const FindFreelancerHero: React.FC<HeroProps> = ({
         <div className='absolute inset-0 bg-black/60' /> {/* Dark overlay */}
       </div>
       {/* --Text Section-- */}
-      <div className='relative z-10 w-full h-full flex flex-col items-center justify-center text-center p-6 text-white'>
+      <div className='relative z-10 w-full h-full flex flex-col items-center justify-center text-center p-6 text-white gap-4'>
         <h1 className='text-3xl md:text-4xl font-bold mb-4 bg-gradient-to-r from-blue-400 to-green-600 bg-clip-text text-transparent'>
           {title}
         </h1>
         <p className='text-md md:text-lg max-w-full md:max-w-3xl text-gray-400'>
           {paragraph}
         </p>
+        {/* --Button Section-- */}
+        <div>
+          <Link href={link}>
+            <button className='bg-white text-black px-8 py-3 rounded-md cursor-pointer hover:bg-gray-300'>
+              {button}
+            </button>
+          </Link>
+        </div>
       </div>
     </div>
   );
