@@ -1,7 +1,28 @@
+'use client';
+
 import FindFreelancerHero from '@/ui/FindFreelancerHero';
-import React from 'react';
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/navigation';
+import React, { useEffect } from 'react';
 
 const FindFreelancer = () => {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = getCookie('user_token');
+    const role = getCookie('user_role');
+
+    if (!token || !role) {
+      router.push('/login');
+      return;
+    }
+
+    if (role !== 'client') {
+      router.push('/');
+      return;
+    }
+  }, [router]);
+
   return (
     <div>
       {/* --HeroSection-- */}
