@@ -1,5 +1,4 @@
 import FindFreelancerHero from '@/ui/FindFreelancerHero';
-import Tabs from '@/ui/Tabs';
 import React from 'react';
 
 const FindFreelancer = () => {
@@ -14,10 +13,6 @@ const FindFreelancer = () => {
           link='/client-dashboard'
           button='Go to dashboard'
         />
-        {/* --Tabs Section-- */}
-        {/* <div>
-          <Tabs />
-        </div> */}
       </div>
     </div>
   );
