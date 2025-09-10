@@ -1,5 +1,6 @@
 'use client';
 
+import Link from 'next/link';
 import React, { useState, useMemo } from 'react';
 import { FaDollarSign } from 'react-icons/fa';
 
@@ -177,9 +178,11 @@ const AllJobsComponent = ({ jobs, error }: AllJobsComponentProps) => {
               </div>
 
               {/* Job Title */}
-              <h3 className='text-lg md:text-xl font-bold mb-3 group-hover:text-blue-400 transition-colors duration-300'>
-                {job.title}
-              </h3>
+              <Link href={`/client-dashboard/job-details/${job._id}`}>
+                <h3 className='text-lg md:text-xl font-bold mb-3 group-hover:text-blue-400 transition-colors duration-300'>
+                  {job.title}
+                </h3>
+              </Link>
 
               {/* Job Description */}
               <p className='text-gray-400 text-sm mb-4 line-clamp-2 leading-relaxed'>
