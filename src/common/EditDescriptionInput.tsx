@@ -8,6 +8,7 @@ interface EditFormDescriptionProps {
   placeholder?: string;
   value: string;
   onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => void;
+  onBlur?: (e: React.FocusEvent<HTMLTextAreaElement>) => void;
   required?: boolean;
 }
 
@@ -18,6 +19,7 @@ const EditDescriptionInput: React.FC<EditFormDescriptionProps> = ({
   placeholder,
   value,
   onChange,
+  onBlur,
   required,
 }) => {
   return (
@@ -35,6 +37,7 @@ const EditDescriptionInput: React.FC<EditFormDescriptionProps> = ({
         placeholder={placeholder}
         value={value}
         onChange={onChange}
+        onBlur={onBlur}
         required={required}
         className='p-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 '
       />

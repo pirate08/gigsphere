@@ -24,6 +24,12 @@ interface JobDetailsProps {
   job: Job;
 }
 
+// NEW: Interface for the Edit component's props
+export interface EditComponentProps {
+  job: Job;
+  closeModel: () => void;
+}
+
 const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
   const [modelOpen, setModelOpen] = useState<boolean>(false);
   // const [modelClose, setModelClose] = useState<boolean>(false);
@@ -33,16 +39,16 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
     setModelOpen(!modelOpen);
   };
 
-  // const closeModel = () => {
-  //   setModelOpen(false);
-  // };
+  const closeModel = () => {
+    setModelOpen(false);
+  };
 
   // You'll render the job's details here
   return (
     <div className='bg-black text-white p-4 sm:p-6 lg:p-8 min-h-screen'>
       {modelOpen ? (
         <div className='cursor-pointer'>
-          <Edit job={job} />
+          <Edit job={job} closeModel={closeModel} />
         </div>
       ) : (
         <div className='w-full max-w-6xl mx-auto bg-gray-900 rounded-lg shadow-2xl p-4 sm:p-6 lg:p-8 border border-gray-700'>
