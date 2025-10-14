@@ -41,7 +41,7 @@ const sliderDetails: sliderProps[] = [
     id: 3,
     avatar: '/Avatar/avatar4.jpg',
     quote:
-      "We've hired multiple freelancers through FreelanceHub for our content marketing needs. Every single experience has been professional and results-driven.",
+      'We&apos;ve hired multiple freelancers through FreelanceHub for our content marketing needs. Every single experience has been professional and results-driven.',
     name: 'Emily Johnson',
     role: 'Marketing Director, GrowthCo',
     message: 'Content Marketing Campaign',
@@ -59,7 +59,7 @@ const sliderDetails: sliderProps[] = [
     id: 5,
     avatar: '/Avatar/avatar5.jpg',
     quote:
-      "FreelanceHub's project management tools make collaboration seamless. We've completed over 50 projects with zero payment issues.",
+      "FreelanceHub&apos;s project management tools make collaboration seamless. We've completed over 50 projects with zero payment issues.",
     name: 'Lisa Thompson',
     role: 'Founder, CreativeStudio',
     message: 'Website Redesign',
@@ -99,7 +99,7 @@ const Testimonal = () => {
           Says
         </h2>
         <p className='text-base sm:text-lg lg:text-xl text-gray-500 max-w-3xl mx-auto leading-relaxed'>
-          Join thousands of satisfied clients and freelancers who've found
+          Join thousands of satisfied clients and freelancers who&apos;ve found
           success on our platform
         </p>
       </div>
@@ -121,7 +121,7 @@ const Testimonal = () => {
             <div key={currentItem.id}>
               {/* Paragraph */}
               <p className='text-center text-lg sm:text-xl lg:text-2xl max-w-3xl mb-10 italic text-white'>
-                "{currentItem.quote}"
+                &quot;{currentItem.quote}&quot;
               </p>
               {/* Details of the speaker */}
               <div className='flex justify-center items-center gap-4 mt-6'>

@@ -1,4 +1,3 @@
-// In app/client-dashboard/job-details/[jobId]/page.tsx
 import { cookies } from 'next/headers';
 import JobDetailsPage from '@/components/JobDetailsPage';
 
@@ -41,7 +40,7 @@ const JobDetails = async ({
     const job = data.job;
 
     return <JobDetailsPage job={job} />;
-  } catch (error) {
+  } catch (_) {
     return (
       <div className='flex items-center justify-center h-screen bg-black text-white'>
         <div className='text-red-400 text-center text-lg md:text-xl p-6'>

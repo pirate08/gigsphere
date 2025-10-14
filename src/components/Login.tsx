@@ -70,7 +70,7 @@ const Login = () => {
           duration: 4000,
         });
       }
-    } catch (error) {
+    } catch (_) {
       toast.error('Signin failed. Please try again.', { duration: 4000 });
     } finally {
       setIsLoading(false);

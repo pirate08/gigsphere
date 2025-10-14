@@ -29,7 +29,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
             Hire Freelancers
           </h3>
           <p className='text-xs text-gray-500 text-center'>
-            I'm a client looking for talent
+            I&apos;m a client looking for talent
           </p>
         </div>
       </div>
@@ -46,7 +46,7 @@ const RoleSelection: React.FC<RoleSelectionProps> = ({
             Find Work
           </h3>
           <p className='text-xs text-gray-500 text-center'>
-            I'm a freelancer seeking jobs
+            I&apos;m a freelancer seeking jobs
           </p>
         </div>
       </div>
