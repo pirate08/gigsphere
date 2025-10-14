@@ -1,5 +1,4 @@
 'use client';
-
 import React, { useState, useEffect } from 'react';
 
 interface QuoteOfTheDay {
@@ -12,19 +11,19 @@ const quotes: QuoteOfTheDay[] = [
   {
     id: 2,
     quote:
-      'Alone we can do so little; together we can do so much.” – Helen Keller',
+      'Alone we can do so little; together we can do so much." – Helen Keller',
   },
   {
     id: 3,
     quote:
-      'The strength of the team is each individual member. The strength of each member is the team.” – Phil Jackson',
+      'The strength of the team is each individual member. The strength of each member is the team." – Phil Jackson',
   },
   {
     id: 4,
     quote:
-      'Coming together is a beginning. Keeping together is progress. Working together is success.” – Henry Ford',
+      'Coming together is a beginning. Keeping together is progress. Working together is success." – Henry Ford',
   },
-  { id: 5, quote: 'None of us is as smart as all of us.” – Ken Blanchard' },
+  { id: 5, quote: 'None of us is as smart as all of us." – Ken Blanchard' },
 ];
 
 const SigninLeftCard = () => {
@@ -36,7 +35,6 @@ const SigninLeftCard = () => {
     const interval = setInterval(() => {
       setCurrentIndex((prevIndex) => (prevIndex + 1) % quotes.length);
     }, 5000);
-
     return () => clearInterval(interval);
   }, []);
 
@@ -46,7 +44,6 @@ const SigninLeftCard = () => {
       setIsShaking(true);
       setTimeout(() => setIsShaking(false), 1000); // Shake for 1 second
     }, 3000); // Every 5 seconds (same as quote changes)
-
     return () => clearInterval(interval);
   }, []);
 
@@ -75,7 +72,7 @@ const SigninLeftCard = () => {
 
       {/* Extra Quote/Tagline */}
       <div className='mt-6 italic text-gray-200 text-sm max-w-sm transition-opacity duration-700 ease-in-out'>
-        &lsquo;{quotes[currentIndex].quote}&rsquo;{' '}
+        &ldquo;{quotes[currentIndex].quote}&rdquo;
       </div>
     </div>
   );
