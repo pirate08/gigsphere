@@ -8,23 +8,23 @@ interface QuoteOfTheDay {
 }
 
 const quotes: QuoteOfTheDay[] = [
-  { id: 1, quote: "“Great things happen when you connect with your team...”" },
+  { id: 1, quote: 'Great things happen when you connect with your team...' },
   {
     id: 2,
     quote:
-      "“Alone we can do so little; together we can do so much.” – Helen Keller",
+      'Alone we can do so little; together we can do so much.” – Helen Keller',
   },
   {
     id: 3,
     quote:
-      "“The strength of the team is each individual member. The strength of each member is the team.” – Phil Jackson",
+      'The strength of the team is each individual member. The strength of each member is the team.” – Phil Jackson',
   },
   {
     id: 4,
     quote:
-      "“Coming together is a beginning. Keeping together is progress. Working together is success.” – Henry Ford",
+      'Coming together is a beginning. Keeping together is progress. Working together is success.” – Henry Ford',
   },
-  { id: 5, quote: "“None of us is as smart as all of us.” – Ken Blanchard" },
+  { id: 5, quote: 'None of us is as smart as all of us.” – Ken Blanchard' },
 ];
 
 const SigninLeftCard = () => {
@@ -75,7 +75,7 @@ const SigninLeftCard = () => {
 
       {/* Extra Quote/Tagline */}
       <div className='mt-6 italic text-gray-200 text-sm max-w-sm transition-opacity duration-700 ease-in-out'>
-        {quotes[currentIndex].quote}
+        &lsquo;{quotes[currentIndex].quote}&rsquo;{' '}
       </div>
     </div>
   );

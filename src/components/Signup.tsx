@@ -87,7 +87,7 @@ const Signup = () => {
           duration: 4000,
         });
       }
-    } catch (_) {
+    } catch {
       toast.error('Signup failed. Please try again.', { duration: 4000 });
     } finally {
       setIsLoading(false);

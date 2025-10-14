@@ -40,7 +40,7 @@ const JobDetails = async ({
     const job = data.job;
 
     return <JobDetailsPage job={job} />;
-  } catch (_) {
+  } catch {
     return (
       <div className='flex items-center justify-center h-screen bg-black text-white'>
         <div className='text-red-400 text-center text-lg md:text-xl p-6'>
