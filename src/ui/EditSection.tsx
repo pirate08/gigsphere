@@ -3,9 +3,10 @@
 import EditDescriptionInput from '@/common/EditDescriptionInput';
 import EditFormInput from '@/common/EditFormInput';
 import React, { useState } from 'react';
-// import toast from 'react-hot-toast';
+import toast from 'react-hot-toast';
 import { FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
+import { getCookie } from 'cookies-next';
 
 // Define the Job interface to match the data structure
 interface Job {
@@ -24,7 +25,7 @@ interface Job {
 
 interface EditProps {
   job: Job;
-  closeModel: () => void; // Must match the prop passed from JobDetailsPage.tsx
+  closeModel: () => void;
 }
 
 const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
@@ -34,7 +35,8 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
   const [localSkillsInput, setLocalSkillsInput] = useState<string>(
     job.skills.join(', ')
   );
-  // 3.
+  // 3. Setting the state to handle the saving button
+  const [isSaving, setIsSaving] = useState<boolean>(false);
 
   // General handler for all fields *except* skills and budget
   const handleInputChanges = (
@@ -81,6 +83,70 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
     closeModel();
   };
 
+  // --Handle Form Submission--
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    // --Get token from cookies--
+    const token = getCookie('user_token');
+
+    if (!token) {
+      toast.error('No authentication token found. Please log in again.', {
+        duration: 4000,
+      });
+      return;
+    }
+
+    setIsSaving(true);
+
+    // 3. Finalize data to send
+    const finalSkillsArray = localSkillsInput
+      .split(',')
+      .map((skill) => skill.trim())
+      .filter((skill) => skill.length > 0);
+
+    const updatedFormData = {
+      ...formData,
+      skills: finalSkillsArray,
+      updatedAt: new Date().toISOString(),
+    };
+
+    // --Api Call--
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/jobs/${job._id}`,
+        {
+          method: 'PUT',
+          headers: {
+            Authorization: `Bearer ${token}`,
+            'Content-Type': 'application/json',
+          },
+          cache: 'no-store',
+          body: JSON.stringify(updatedFormData),
+        }
+      );
+
+      if (response.ok) {
+        toast.success('Job updated successfully!', {
+          duration: 4000,
+        });
+        setIsSaving(false);
+        closeModel();
+        window.location.reload();
+      }
+    } catch (error) {
+      console.error('Error updating job:', error);
+      toast.error(
+        'An error occurred while updating the job. Please try again.',
+        {
+          duration: 4000,
+        }
+      );
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
   return (
     <div className='w-full min-h-screen flex flex-col justify-start items-center md:max-w-3xl mx-auto px-4 sm:px-8 py-8 md:py-10 bg-gray-900/70 text-white rounded-2xl  backdrop-blur-md'>
       <h1 className='text-2xl md:text-3xl bg-gradient-to-r from-blue-400 to-green-600 bg-clip-text text-transparent font-bold'>
@@ -88,7 +154,7 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
       </h1>
       {/* --Form-- */}
       <div className='w-full mt-6'>
-        <form className='space-y-6'>
+        <form className='space-y-6' onSubmit={handleSubmit}>
           {/* --Title Section-- */}
           <EditFormInput
             label='Full Name'
@@ -193,24 +259,28 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
               <option value='draft'>Draft</option>
             </select>
           </div>
+          {/* --Buttons-- */}
+          <div className='flex justify-center gap-4 mt-6'>
+            <button
+              type='button'
+              className='flex items-center gap-1 bg-white text-black cursor-pointer px-4 py-2 rounded-md hover:bg-gray-200'
+              onClick={handleCancel}>
+              <span>
+                <RiArrowGoBackLine />
+              </span>
+              Go Back
+            </button>
+            <button
+              type='submit'
+              disabled={isSaving}
+              className='flex items-center gap-2 bg-green-700 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-green-800'>
+              <span>
+                <FaSave />
+              </span>
+              {isSaving ? 'Saving...' : ' Save'}
+            </button>
+          </div>
         </form>
-        {/* --Buttons-- */}
-        <div className='flex justify-center gap-4 mt-6'>
-          <button
-            className='flex items-center gap-1 bg-white text-black cursor-pointer px-4 py-2 rounded-md hover:bg-gray-200'
-            onClick={handleCancel}>
-            <span>
-              <RiArrowGoBackLine />
-            </span>
-            Go Back
-          </button>
-          <button className='flex items-center gap-2 bg-green-700 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-green-800'>
-            <span>
-              <FaSave />
-            </span>
-            Save
-          </button>
-        </div>
       </div>
     </div>
   );

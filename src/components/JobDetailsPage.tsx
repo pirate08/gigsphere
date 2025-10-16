@@ -117,7 +117,10 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
                 Budget:
               </h3>
               <span className='text-green-400 font-bold text-sm sm:text-base'>
-                ${job.budget.toLocaleString()}
+                {job.budget.toLocaleString('en-US', {
+                  style: 'currency',
+                  currency: 'USD',
+                })}
               </span>
             </div>
             <div className='flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-0'>
