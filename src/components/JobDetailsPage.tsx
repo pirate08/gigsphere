@@ -3,6 +3,9 @@
 import Edit from '@/ui/EditSection';
 import React, { useState } from 'react';
 import { MdEdit, MdDelete } from 'react-icons/md';
+import toast from 'react-hot-toast';
+import { getCookie } from 'cookies-next';
+import { useRouter } from 'next/navigation';
 
 // Define the Job interface to match the data structure
 interface Job {
@@ -31,8 +34,9 @@ export interface EditComponentProps {
 }
 
 const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
+  const router = useRouter();
   const [modelOpen, setModelOpen] = useState<boolean>(false);
-  // const [modelClose, setModelClose] = useState<boolean>(false);
+  const [isDeleting, setIsDeleting] = useState<boolean>(false);
 
   // --Function to handle the Model--
   const openModel = () => {
@@ -41,6 +45,54 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
 
   const closeModel = () => {
     setModelOpen(false);
+  };
+
+  const handleDelete = async () => {
+    // --Console to check if the delete button is working--
+    console.log('Delete button clicked');
+
+    // --Model popup for delete confirmation--
+    if (
+      !window.confirm(
+        `Are you sure you want to delete this ${job.title}? This action cannot be undone.`
+      )
+    ) {
+      return;
+    }
+
+    setIsDeleting(true);
+
+    const token = getCookie('user_token');
+
+    if (!token) {
+      toast.error('You must be logged in to delete a job.');
+      setIsDeleting(false);
+      return;
+    }
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/jobs/${job._id}`,
+        // `http://localhost:5000/api/client/jobs/${job._id}`,
+        {
+          method: 'DELETE',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (response.ok) {
+        toast.success('Job deleted successfully!');
+        // Redirect to the jobs listing page or another appropriate page
+        router.push('/client-dashboard/all-jobs');
+      }
+    } catch (error) {
+      console.error('Error deleting job:', error);
+      toast.error('Failed to delete the job. Please try again.');
+      setIsDeleting(false);
+    }
   };
 
   // You'll render the job's details here
@@ -75,11 +127,14 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
                 Edit
               </button>
               {/* Delete */}
-              <button className='px-3 py-1 sm:px-4 sm:py-1 rounded-full text-xs sm:text-sm font-semibold border bg-red-700/100 cursor-pointer hover:bg-red-600 transition-colors whitespace-nowrap flex items-center gap-1'>
+              <button
+                className='px-3 py-1 sm:px-4 sm:py-1 rounded-full text-xs sm:text-sm font-semibold border bg-red-700/100 cursor-pointer hover:bg-red-600 transition-colors whitespace-nowrap flex items-center gap-1'
+                onClick={handleDelete}
+                disabled={isDeleting}>
                 <span>
                   <MdDelete />
                 </span>
-                Delete
+                {isDeleting ? 'Deleting...' : 'Delete'}
               </button>
             </div>
           </div>
