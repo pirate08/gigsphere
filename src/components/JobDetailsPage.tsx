@@ -183,7 +183,7 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
                 Posted:
               </h3>
               <span className='text-white text-sm sm:text-base'>
-                {new Date(job.createdAt).toLocaleDateString()}
+                {new Date(job.createdAt).toLocaleDateString('en-GB')}
               </span>
             </div>
           </div>

@@ -2,11 +2,13 @@
 
 import EditDescriptionInput from '@/common/EditDescriptionInput';
 import EditFormInput from '@/common/EditFormInput';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { FaSave } from 'react-icons/fa';
 import { RiArrowGoBackLine } from 'react-icons/ri';
 import { getCookie } from 'cookies-next';
+
+
 
 // Define the Job interface to match the data structure
 interface Job {
@@ -37,6 +39,35 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
   );
   // 3. Setting the state to handle the saving button
   const [isSaving, setIsSaving] = useState<boolean>(false);
+  // 4. State to track if any modifications have been made
+  const [isModified, setIsModified] = useState<boolean>(false);
+
+  //  Function to deeply compare current and original data
+  const hasChanges = (data: Job, original: Job, skillsStr: string) => {
+    const normalizedSkills = skillsStr
+      .split(',')
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+
+    const sameSkills =
+      JSON.stringify(normalizedSkills.sort()) ===
+      JSON.stringify(original.skills.sort());
+
+    return !(
+      data.title === original.title &&
+      data.description === original.description &&
+      data.location === original.location &&
+      data.employmentType === original.employmentType &&
+      data.budget === original.budget &&
+      data.status === original.status &&
+      sameSkills
+    );
+  };
+
+  //  Check for changes whenever formData or skills input changes
+  useEffect(() => {
+    setIsModified(hasChanges(formData, job, localSkillsInput));
+  }, [formData, localSkillsInput, job]);
 
   // General handler for all fields *except* skills and budget
   const handleInputChanges = (
@@ -272,8 +303,12 @@ const Edit: React.FC<EditProps> = ({ job, closeModel }) => {
             </button>
             <button
               type='submit'
-              disabled={isSaving}
-              className='flex items-center gap-2 bg-green-700 text-white cursor-pointer px-4 py-2 rounded-md hover:bg-green-800'>
+              disabled={isSaving || !isModified}
+              className={`flex items-center gap-2 px-4 py-2 rounded-md transition-colors ${
+                isSaving || !isModified
+                  ? 'bg-gray-500 cursor-not-allowed'
+                  : 'bg-green-700 hover:bg-green-800 cursor-pointer'
+              }`}>
               <span>
                 <FaSave />
               </span>
