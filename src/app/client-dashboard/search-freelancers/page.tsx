@@ -1,5 +1,4 @@
 import SearchFeatureUI from '@/components/SearchFeature';
-
 import React from 'react';
 
 const SearchFreelancer = () => {
