@@ -7,11 +7,14 @@ import { FaPen, FaCheck, FaTimes } from 'react-icons/fa';
 import { FaLock } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '@/common/PasswordInput';
+import toast from 'react-hot-toast';
 
+
+// These interfaces are correct and do not need changes
 interface UserProps {
   id: number;
   avatar: string;
-  fullName: string;
+  name: string;
   email: string;
   totalWork: number;
   openJobs: number;
@@ -19,34 +22,35 @@ interface UserProps {
   closedJobs: number;
 }
 
-const UserDetails: UserProps[] = [
-  {
-    id: 1,
-    avatar: 'M',
-    fullName: 'Mayukh Deb Goswami',
-    email: 'tiklu@gmail.com',
-    totalWork: 20,
-    openJobs: 10,
-    draftJobs: 4,
-    closedJobs: 6,
-  },
-];
+interface ProfileUIProps {
+  profileData: UserProps[];
+}
 
-const ProfileUI = () => {
+// ⭐️ FIX 1: Explicitly type the props object (ProfileUIProps)
+const ProfileUI = ({ profileData }: ProfileUIProps) => {
   const router = useRouter();
   const [currentPassword, setCurrentPassword] = useState(false);
   const [newPassword, setNewPassword] = useState(false);
   const [confirmPassword, setConfirmPassword] = useState(false);
   const [isEditing, setIsEditing] = useState(false);
 
-  const [editName, setEditName] = useState(UserDetails[0].fullName);
-  const [editEmail, setEditEmail] = useState(UserDetails[0].email);
+  const initialUser = profileData[0];
+
+  // Use a fallback just in case the array is empty
+  if (!initialUser) {
+    return (
+      <div className='text-white text-center p-10'>No user data available.</div>
+    );
+  }
+
+  const [editName, setEditName] = useState(initialUser.name);
+  const [editEmail, setEditEmail] = useState(initialUser.email);
 
   return (
     <div className='min-h-screen w-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex justify-center items-center py-8 px-4 sm:px-6 lg:px-10'>
-      {UserDetails.map((user) => (
+      {profileData.map((data: UserProps) => (
         <motion.div
-          key={user.id}
+          key={data.id}
           initial={{ opacity: 0, scale: 0.9, y: 20 }}
           animate={{ opacity: 1, scale: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -54,12 +58,12 @@ const ProfileUI = () => {
           {/* Avatar */}
           <div className='relative group'>
             <h1 className='h-28 w-28 object-fit rounded-full flex items-center justify-center text-3xl md:text-5xl bg-white z-50 text-black'>
-              {user.avatar}
+              {data.avatar}
             </h1>
             <div className='absolute -inset-1 rounded-full bg-gradient-to-r from-blue-500 to-green-500 opacity-20 blur-lg group-hover:opacity-40 transition duration-300'></div>
           </div>
 
-          {/* Editable Name & Email */}
+          {/* Editable Name & Email - Using editName/editEmail state values here */}
           <div className='w-full mt-6 flex flex-col sm:flex-row items-center justify-between gap-4'>
             <div className='text-center sm:text-left w-full'>
               {isEditing ? (
@@ -117,18 +121,16 @@ const ProfileUI = () => {
           {/* Divider */}
           <div className='w-full border-t border-gray-700 my-8'></div>
 
-          {/* Stats Section */}
+          {/* Stats Section - Using the map element 'data' */}
           <div className='grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 w-full'>
-            <StatBox label='Total Work' value={user.totalWork} />
-            <StatBox label='Open Jobs' value={user.openJobs} />
-            <StatBox label='Draft Jobs' value={user.draftJobs} />
-            <StatBox label='Closed Jobs' value={user.closedJobs} />
+            <StatBox label='Total Work' value={data.totalWork} />
+            <StatBox label='Open Jobs' value={data.openJobs} />
+            <StatBox label='Draft Jobs' value={data.draftJobs} />
+            <StatBox label='Closed Jobs' value={data.closedJobs} />
           </div>
 
-          {/* Divider */}
+          {/* ... Security Settings ... */}
           <div className='w-full border-t border-gray-700 my-8'></div>
-
-          {/* Security Settings */}
           <div className='w-full max-w-md mx-auto'>
             <div className='flex items-center justify-center gap-2'>
               <FaLock className='text-blue-400' />
@@ -140,7 +142,6 @@ const ProfileUI = () => {
 
             {/* Input Fields */}
             <div className='space-y-5 mt-7'>
-              {/* Current Password */}
               <PasswordInput
                 placeholder='Current Password'
                 visible={currentPassword}
@@ -148,7 +149,6 @@ const ProfileUI = () => {
                 color='blue'
               />
 
-              {/* New Password */}
               <PasswordInput
                 placeholder='New Password'
                 visible={newPassword}
@@ -156,7 +156,6 @@ const ProfileUI = () => {
                 color='green'
               />
 
-              {/* Confirm Password */}
               <PasswordInput
                 placeholder='Confirm Password'
                 visible={confirmPassword}
