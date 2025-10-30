@@ -8,7 +8,7 @@ import { FaLock } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '@/common/PasswordInput';
 import toast from 'react-hot-toast';
-
+import { getCookie } from 'cookies-next';
 
 // These interfaces are correct and do not need changes
 interface UserProps {
@@ -29,10 +29,11 @@ interface ProfileUIProps {
 // ⭐️ FIX 1: Explicitly type the props object (ProfileUIProps)
 const ProfileUI = ({ profileData }: ProfileUIProps) => {
   const router = useRouter();
-  const [currentPassword, setCurrentPassword] = useState(false);
-  const [newPassword, setNewPassword] = useState(false);
-  const [confirmPassword, setConfirmPassword] = useState(false);
-  const [isEditing, setIsEditing] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState<boolean>(false);
+  const [newPassword, setNewPassword] = useState<boolean>(false);
+  const [confirmPassword, setConfirmPassword] = useState<boolean>(false);
+  const [isEditing, setIsEditing] = useState<boolean>(false);
+  const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
   const initialUser = profileData[0];
 
@@ -45,6 +46,66 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
 
   const [editName, setEditName] = useState(initialUser.name);
   const [editEmail, setEditEmail] = useState(initialUser.email);
+
+  // --Handling Api Call-
+  const handleSave = async () => {
+    if (initialUser.name === editName && initialUser.email === editEmail) {
+      toast.error('No changes made to save.');
+      setIsEditing(false);
+      return;
+    }
+
+    setIsSubmitting(true);
+    const token = getCookie('user_token');
+    if (!token) {
+      toast.error('User not authenticated.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const loadingToast = toast.loading('Saving changes...');
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/profile/details`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            fullName: editName,
+            email: editEmail,
+          }),
+        }
+      );
+      if (response.ok) {
+        toast.success('Profile updated successfully!', { id: loadingToast });
+        setIsEditing(false);
+        router.refresh();
+      } else {
+        const errorData = await response.json();
+        toast.error(`Update failed: ${errorData.message || 'Server Error'}`, {
+          id: loadingToast,
+        });
+      }
+    } catch (error) {
+      toast.error('An error occurred while saving changes.');
+      console.error('Error saving profile changes:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  // --Cancel Function--
+  const handleCancel = () => {
+    setEditName(initialUser.name);
+    setEditEmail(initialUser.email);
+    setIsEditing(false);
+    toast.dismiss();
+    toast('Changes discarded.', { icon: '👋' });
+  };
 
   return (
     <div className='min-h-screen w-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex justify-center items-center py-8 px-4 sm:px-6 lg:px-10'>
@@ -98,13 +159,15 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
               {isEditing ? (
                 <>
                   <button
-                    onClick={() => setIsEditing(false)}
-                    className='p-2 rounded-full bg-red-600 hover:bg-red-500 transition duration-200'>
+                    onClick={handleCancel}
+                    className='p-2 rounded-full bg-red-600 hover:bg-red-500 transition duration-200 cursor-pointer'
+                    disabled={isSubmitting}>
                     <FaTimes />
                   </button>
                   <button
-                    onClick={() => setIsEditing(false)} // replace with save function later
-                    className='p-2 rounded-full bg-green-600 hover:bg-green-500 transition duration-200'>
+                    onClick={handleSave}
+                    disabled={isSubmitting}
+                    className='p-2 rounded-full bg-green-600 hover:bg-green-500 transition duration-200 cursor-pointer'>
                     <FaCheck />
                   </button>
                 </>
