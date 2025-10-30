@@ -8,7 +8,7 @@ import { FaLock } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '@/common/PasswordInput';
 import toast from 'react-hot-toast';
-import { getCookie } from 'cookies-next';
+import { getCookie, deleteCookie } from 'cookies-next';
 
 // These interfaces are correct and do not need changes
 interface UserProps {
@@ -34,6 +34,9 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
   const [confirmPassword, setConfirmPassword] = useState<boolean>(false);
   const [isEditing, setIsEditing] = useState<boolean>(false);
   const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
+  const [currentValue, setCurrentValue] = useState('');
+  const [newValue, setNewValue] = useState('');
+  const [confirmValue, setConfirmValue] = useState('');
 
   const initialUser = profileData[0];
 
@@ -107,6 +110,78 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
     toast('Changes discarded.', { icon: '👋' });
   };
 
+  // --Handle password change--
+  const handlePasswordChange = async () => {
+    // --Input Validation--
+    if (!currentValue || !newValue || !confirmValue) {
+      toast.error('All password fields are required');
+      return;
+    }
+
+    if (newValue !== confirmValue) {
+      toast.error('New Password and Confirm Password do not match.');
+      return;
+    }
+
+    if (newValue.length < 6) {
+      toast.error('New password must be at least 6 characters long.');
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    const token = getCookie('user_token');
+
+    if (!token) {
+      toast.error('User not authenticated.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const loadingToast = toast.loading('Changing password...');
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/profile/password`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword: currentValue,
+            newPassword: newValue,
+            confirmPassword: confirmValue,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        toast.success('Password changed successfully!', { id: loadingToast });
+        // --Clear all the inputs--
+        setCurrentValue('');
+        setNewValue('');
+        setConfirmValue('');
+
+        // --Send the user to logout--
+        deleteCookie('user_token');
+        deleteCookie('user_role');
+        router.push('/login');
+      } else {
+        const errorData = await response.json();
+        toast.error(`Update failed: ${errorData.message || 'Server Error'}`, {
+          id: loadingToast,
+        });
+      }
+    } catch (error) {
+      toast.error('An unexpected network error occurred.');
+      console.error('Error changing password:', error);
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   return (
     <div className='min-h-screen w-full bg-gradient-to-br from-gray-950 via-gray-900 to-gray-800 flex justify-center items-center py-8 px-4 sm:px-6 lg:px-10'>
       {profileData.map((data: UserProps) => (
@@ -174,7 +249,7 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
               ) : (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className='p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition duration-200'>
+                  className='p-2 rounded-full bg-gray-700 hover:bg-gray-600 transition duration-200 cursor-pointer'>
                   <FaPen />
                 </button>
               )}
@@ -208,6 +283,10 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
               <PasswordInput
                 placeholder='Current Password'
                 visible={currentPassword}
+                value={currentValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setCurrentValue(e.target.value);
+                }}
                 setVisible={setCurrentPassword}
                 color='blue'
               />
@@ -215,6 +294,10 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
               <PasswordInput
                 placeholder='New Password'
                 visible={newPassword}
+                value={newValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setNewValue(e.target.value);
+                }}
                 setVisible={setNewPassword}
                 color='green'
               />
@@ -222,6 +305,10 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
               <PasswordInput
                 placeholder='Confirm Password'
                 visible={confirmPassword}
+                value={confirmValue}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => {
+                  setConfirmValue(e.target.value);
+                }}
                 setVisible={setConfirmPassword}
                 color='purple'
               />
@@ -234,8 +321,11 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
                 onClick={() => router.back()}>
                 Go Back
               </button>
-              <button className='px-5 py-2 bg-blue-600 hover:bg-blue-500 text-sm md:text-base text-white rounded-lg transition-all duration-200 cursor-pointer'>
-                Save Changes
+              <button
+                className='px-5 py-2 bg-blue-600 hover:bg-blue-500 text-sm md:text-base text-white rounded-lg transition-all duration-200 cursor-pointer'
+                disabled={isSubmitting}
+                onClick={handlePasswordChange}>
+                {isSubmitting ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
           </div>
