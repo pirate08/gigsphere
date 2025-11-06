@@ -24,6 +24,11 @@ const JobFeed = () => {
       <div>
         <SearchJobs />
       </div>
+
+      {/* --Job Card goes here-- */}
+      <div>
+        
+      </div>
     </div>
   );
 };

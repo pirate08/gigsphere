@@ -67,14 +67,14 @@ const SearchJobs: React.FC = () => {
           </div>
           <button
             onClick={() => setShowFilters(!showFilters)}
-            className='sm:w-auto px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center gap-2 transition-colors border border-gray-600'>
+            className='sm:w-auto px-6 py-3 bg-gray-700 hover:bg-gray-600 rounded-lg flex items-center justify-center gap-2 transition-colors border border-gray-600 cursor-pointer'>
             <FiFilter className='text-lg' />
             <span>Filters</span>
             {showFilters && <FiX className='text-lg' />}
           </button>
           <button
             onClick={handleSearch}
-            className='sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg font-semibold transition-all shadow-lg hover:shadow-green-500/50'>
+            className='sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg font-semibold transition-all shadow-lg hover:shadow-green-500/50 cursor-pointer'>
             Search Jobs
           </button>
         </div>

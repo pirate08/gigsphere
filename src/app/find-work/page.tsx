@@ -18,7 +18,7 @@ const FindWork = () => {
     }
 
     if (role !== 'freelancer') {
-      router.push('/login');
+      router.push('/');
       return;
     }
   }, [router]);
