@@ -4,7 +4,7 @@ import JobFeed from './JobFeed';
 
 const FindWorkUi = () => {
   return (
-    <div className='h-screen w-full bg-black text-white px-5 md:px-16'>
+    <div className='h-full w-full bg-black text-white px-5 md:px-16 py-8'>
       {/* --Navbar-- */}
       <FindWorkNavbar />
       {/* --Job Feed-- */}

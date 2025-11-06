@@ -1,12 +1,13 @@
 import SearchJobs from '@/ui/SearchJobsFreelancer';
 import React from 'react';
+import JobFeedCard from './JobFeedCardSection';
 
 const JobFeed = () => {
   return (
     <div className='mt-5'>
       {/* --Header-- */}
       {/* Title */}
-      <div className=''>
+      <div>
         <h1 className='text-2xl font-bold md:text-4xl mt-2 md:mt-14'>
           Find{' '}
           <span className='bg-gradient-to-r from-blue-400 to-green-500 bg-clip-text text-transparent'>
@@ -27,7 +28,7 @@ const JobFeed = () => {
 
       {/* --Job Card goes here-- */}
       <div>
-        
+        <JobFeedCard />
       </div>
     </div>
   );
