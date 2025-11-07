@@ -7,6 +7,7 @@ import { CgProfile } from 'react-icons/cg';
 import { MdLogout } from 'react-icons/md';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
+import { IoIosNotifications } from 'react-icons/io';
 
 const FindWorkNavbar = () => {
   const router = useRouter();
@@ -66,6 +67,14 @@ const FindWorkNavbar = () => {
 
         {/* Desktop Buttons */}
         <div className='hidden md:flex items-center gap-4 text-sm'>
+          <Link href='/notification'>
+            <button className='group relative px-4 py-2 rounded-md hover:bg-blue-600 transition cursor-pointer'>
+              <IoIosNotifications className='text-xl' />
+              <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
+                Notification
+              </span>
+            </button>
+          </Link>
           <Link href='/profile'>
             <button className='group relative px-4 py-2 rounded-md hover:bg-green-600 transition cursor-pointer'>
               <CgProfile className='text-xl' />
@@ -125,6 +134,14 @@ const FindWorkNavbar = () => {
         <div className='px-4 py-4 space-y-4'>
           {/* Mobile Buttons */}
           <div className='flex flex-col gap-3 pt-4'>
+            <Link href='/notification' onClick={closeMenu}>
+              <button className='w-full px-4 py-3 rounded-md hover:bg-green-600 transition cursor-pointer text-white border border-gray-600 flex items-center gap-2 justify-center'>
+                Notifications
+                <span>
+                  <IoIosNotifications className='text-xl' />
+                </span>
+              </button>
+            </Link>
             <Link href='/profile' onClick={closeMenu}>
               <button className='w-full px-4 py-3 rounded-md hover:bg-green-600 transition cursor-pointer text-white border border-gray-600 flex items-center gap-2 justify-center'>
                 Profile
