@@ -82,7 +82,7 @@ const FreelanceJobDetails: React.FC<JobDetailsProps> = ({ job }) => {
           <FindWorkNavbar />
         </div>
         {/* Back Button Placeholder */}
-        <div className='mb-6 mt-10'>
+        <div className='mb-6 mt-14 md:mt-10'>
           <Link
             href={'/find-work'}
             className='text-sm text-gray-400 hover:text-green-400 transition-colors flex items-center gap-1 font-medium'>

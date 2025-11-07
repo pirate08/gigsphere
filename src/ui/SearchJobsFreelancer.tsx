@@ -42,11 +42,19 @@ interface JobsResponse {
   };
 }
 
+// 1. UPDATED PROPS INTERFACE
 interface SearchJobsProps {
   onJobsUpdate?: (jobs: Job[], metadata: JobsResponse['metadata']) => void;
+  currentPage: number;
+  setCurrentPage: React.Dispatch<React.SetStateAction<number>>;
 }
 
-const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
+// 2. DESTRUCTURE NEW PROPS
+const SearchJobs: React.FC<SearchJobsProps> = ({
+  onJobsUpdate,
+  currentPage,
+  setCurrentPage,
+}) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [filters, setFilters] = useState<Filters>({
     search: '',
@@ -57,7 +65,7 @@ const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
   });
   const [loading, setLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
-  const [currentPage, setCurrentPage] = useState<number>(1);
+  // REMOVED: const [currentPage, setCurrentPage] = useState<number>(1);
 
   const handleFilterChange = (field: FilterField, value: string): void => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -71,10 +79,11 @@ const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
       minRate: '',
       maxRate: '',
     });
+    // 3. Reset external page state
     setCurrentPage(1);
   };
 
-  const fetchJobs = async (page: number = 1): Promise<void> => {
+  const fetchJobs = async (page: number): Promise<void> => {
     setLoading(true);
     setError(null);
 
@@ -88,8 +97,9 @@ const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
       if (filters.location) queryParams.append('location', filters.location);
       if (filters.minRate) queryParams.append('minRate', filters.minRate);
       if (filters.maxRate) queryParams.append('maxRate', filters.maxRate);
+      // Use the page argument passed from the useEffect hook (which is the currentPage prop)
       queryParams.append('page', page.toString());
-      queryParams.append('limit', '10');
+      queryParams.append('limit', '5');
 
       const response = await fetch(
         `${
@@ -123,14 +133,23 @@ const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
   };
 
   const handleSearch = (): void => {
+    // 3. Reset external page state on new search/filter
     setCurrentPage(1);
-    fetchJobs(1);
   };
 
-  // Fetch jobs on initial load
+  // 4. UPDATED useEffect Hook
+  // Fetch jobs when filters or the currentPage prop changes
   useEffect(() => {
-    fetchJobs(1);
-  }, []);
+    fetchJobs(currentPage);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    currentPage,
+    filters.search,
+    filters.skills,
+    filters.location,
+    filters.minRate,
+    filters.maxRate,
+  ]);
 
   return (
     <div className='mt-6'>

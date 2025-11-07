@@ -3,6 +3,7 @@
 import SearchJobs from '@/ui/SearchJobsFreelancer';
 import React, { useState } from 'react';
 import JobFeedCard from './JobFeedCardSection';
+import { FaChevronLeft, FaChevronRight } from 'react-icons/fa'; // Import icons for pagination
 
 interface Job {
   _id: string;
@@ -26,10 +27,55 @@ interface Metadata {
 const JobFeed = () => {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [metadata, setMetadata] = useState<Metadata | null>(null);
+  // 1. New State for current page
+  const [currentPage, setCurrentPage] = useState<number>(1);
+  const [fetchJobsFunction, setFetchJobsFunction] = useState<
+    (() => void) | null
+  >(null);
 
   const handleJobsUpdate = (fetchedJobs: Job[], fetchedMetadata: Metadata) => {
     setJobs(fetchedJobs);
     setMetadata(fetchedMetadata);
+  };
+
+  // New handler for page changes
+  const handlePageChange = (page: number) => {
+    if (page >= 1 && metadata && page <= metadata.pages) {
+      setCurrentPage(page);
+      // The SearchJobs component will handle the actual fetch via useEffect
+    }
+  };
+
+  // Helper component to render the pagination controls
+  const PaginationControls = () => {
+    if (!metadata || metadata.pages <= 1) return null;
+
+    const { page, pages } = metadata;
+
+    return (
+      <div className='flex justify-center items-center gap-4 mt-8 pb-10'>
+        {/* Previous Button */}
+        <button
+          onClick={() => handlePageChange(page - 1)}
+          disabled={page === 1}
+          className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 bg-gray-800/50 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+          <FaChevronLeft className='text-xs' /> Previous
+        </button>
+
+        {/* Current Page Indicator */}
+        <span className='text-sm text-white font-semibold'>
+          Page {page} of {pages}
+        </span>
+
+        {/* Next Button */}
+        <button
+          onClick={() => handlePageChange(page + 1)}
+          disabled={page === pages}
+          className='flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-400 bg-gray-800/50 border border-gray-700 rounded-lg hover:bg-gray-700 transition-colors disabled:opacity-50 disabled:cursor-not-allowed'>
+          Next <FaChevronRight className='text-xs' />
+        </button>
+      </div>
+    );
   };
 
   return (
@@ -59,13 +105,21 @@ const JobFeed = () => {
 
       {/* --Search Feature-- */}
       <div>
-        <SearchJobs onJobsUpdate={handleJobsUpdate} />
+        {/* Pass currentPage and setCurrentPage to SearchJobs */}
+        <SearchJobs
+          onJobsUpdate={handleJobsUpdate}
+          currentPage={currentPage} // Pass the state
+          setCurrentPage={setCurrentPage} // Pass the setter
+        />
       </div>
 
       {/* --Job Cards-- */}
       <div>
         <JobFeedCard jobs={jobs} />
       </div>
+
+      {/* --Pagination Controls-- */}
+      <PaginationControls />
     </div>
   );
 };
