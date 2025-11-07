@@ -1,6 +1,7 @@
 import React from 'react';
 import { FiMapPin, FiDollarSign, FiBriefcase } from 'react-icons/fi';
 import { BiTime } from 'react-icons/bi';
+import Link from 'next/link';
 
 interface CardProps {
   title: string;
@@ -8,7 +9,7 @@ interface CardProps {
   location: string;
   employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
   budget: number;
-  // NOTE: Keep the type as string[] but the internal logic handles null/undefined
+  link: string;
   skills: string[] | undefined | null;
   createdAt: Date;
 }
@@ -20,6 +21,7 @@ const JobCard: React.FC<CardProps> = ({
   employmentType,
   budget,
   skills,
+  link,
   createdAt,
 }) => {
   // Use a fallback for the skills array
@@ -136,9 +138,11 @@ const JobCard: React.FC<CardProps> = ({
 
         {/* Action Buttons */}
         <div className='flex gap-2 sm:gap-3'>
-          <button className='flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors border border-gray-600 cursor-pointer'>
-            View Details
-          </button>
+          <Link href={link}>
+            <button className='flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-gray-700 hover:bg-gray-600 rounded-lg text-sm font-medium transition-colors border border-gray-600 cursor-pointer'>
+              View Details
+            </button>
+          </Link>
           <button className='flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-green-500/20 cursor-pointer'>
             Apply Now
           </button>

@@ -9,6 +9,7 @@ interface Job {
   employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
   budget: number;
   skills: string[];
+  link: string;
   createdAt: string;
   hasApplied: boolean;
 }
@@ -38,6 +39,7 @@ const JobFeedCard: React.FC<JobFeedCardProps> = ({ jobs }) => {
           employmentType={job.employmentType}
           budget={job.budget}
           skills={job.skills}
+          link={`/find-work/job-details/${job._id}`}
           createdAt={new Date(job.createdAt)}
         />
       ))}

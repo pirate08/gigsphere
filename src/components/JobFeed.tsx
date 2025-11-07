@@ -13,6 +13,7 @@ interface Job {
   budget: number;
   skills: string[];
   createdAt: string;
+  link: string;
   hasApplied: boolean;
 }
 

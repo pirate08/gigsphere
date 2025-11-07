@@ -73,7 +73,6 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
     try {
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_BASE_URL}/api/client/jobs/${job._id}`,
-        // `http://localhost:5000/api/client/jobs/${job._id}`,
         {
           method: 'DELETE',
           headers: {
@@ -144,7 +143,7 @@ const JobDetailsPage: React.FC<JobDetailsProps> = ({ job }) => {
             <h2 className='text-lg sm:text-xl font-semibold mb-2 sm:mb-3'>
               Description
             </h2>
-            <p className='text-gray-300 leading-relaxed text-sm sm:text-base break-words'>
+            <p className='text-gray-300 leading-relaxed text-sm sm:text-base break-words whitespace-pre-line'>
               {job.description}
             </p>
           </div>
