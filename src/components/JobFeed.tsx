@@ -1,12 +1,39 @@
+'use client';
+
 import SearchJobs from '@/ui/SearchJobsFreelancer';
-import React from 'react';
+import React, { useState } from 'react';
 import JobFeedCard from './JobFeedCardSection';
 
+interface Job {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
+  budget: number;
+  skills: string[];
+  createdAt: string;
+  hasApplied: boolean;
+}
+
+interface Metadata {
+  total: number;
+  page: number;
+  pages: number;
+}
+
 const JobFeed = () => {
+  const [jobs, setJobs] = useState<Job[]>([]);
+  const [metadata, setMetadata] = useState<Metadata | null>(null);
+
+  const handleJobsUpdate = (fetchedJobs: Job[], fetchedMetadata: Metadata) => {
+    setJobs(fetchedJobs);
+    setMetadata(fetchedMetadata);
+  };
+
   return (
     <div className='mt-5'>
       {/* --Header-- */}
-      {/* Title */}
       <div>
         <h1 className='text-2xl font-bold md:text-4xl mt-2 md:mt-14'>
           Find{' '}
@@ -19,16 +46,24 @@ const JobFeed = () => {
         <p className='text-sm md:text-[16px] text-gray-400 mt-1'>
           Browse thousands of projects and find your next opportunity.
         </p>
+
+        {/* Display job count */}
+        {metadata && (
+          <p className='text-sm text-gray-500 mt-2'>
+            Showing {jobs.length} of {metadata.total} jobs (Page {metadata.page}{' '}
+            of {metadata.pages})
+          </p>
+        )}
       </div>
 
-      {/* --Search Feature goes here-- */}
+      {/* --Search Feature-- */}
       <div>
-        <SearchJobs />
+        <SearchJobs onJobsUpdate={handleJobsUpdate} />
       </div>
 
-      {/* --Job Card goes here-- */}
+      {/* --Job Cards-- */}
       <div>
-        <JobFeedCard />
+        <JobFeedCard jobs={jobs} />
       </div>
     </div>
   );

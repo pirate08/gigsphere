@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import {
   FiSearch,
   FiMapPin,
@@ -7,6 +7,7 @@ import {
   FiX,
 } from 'react-icons/fi';
 import { BiCodeAlt } from 'react-icons/bi';
+import { getCookie } from 'cookies-next';
 
 interface Filters {
   search: string;
@@ -18,7 +19,33 @@ interface Filters {
 
 type FilterField = keyof Filters;
 
-const SearchJobs: React.FC = () => {
+interface Job {
+  _id: string;
+  title: string;
+  description: string;
+  location: string;
+  employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
+  budget: number;
+  skills: string[];
+  createdAt: string;
+  hasApplied: boolean;
+}
+
+interface JobsResponse {
+  message: string;
+  data: Job[];
+  metadata: {
+    total: number;
+    page: number;
+    pages: number;
+  };
+}
+
+interface SearchJobsProps {
+  onJobsUpdate?: (jobs: Job[], metadata: JobsResponse['metadata']) => void;
+}
+
+const SearchJobs: React.FC<SearchJobsProps> = ({ onJobsUpdate }) => {
   const [showFilters, setShowFilters] = useState<boolean>(false);
   const [filters, setFilters] = useState<Filters>({
     search: '',
@@ -27,6 +54,9 @@ const SearchJobs: React.FC = () => {
     minRate: '',
     maxRate: '',
   });
+  const [loading, setLoading] = useState<boolean>(false);
+  const [error, setError] = useState<string | null>(null);
+  const [currentPage, setCurrentPage] = useState<number>(1);
 
   const handleFilterChange = (field: FilterField, value: string): void => {
     setFilters((prev) => ({ ...prev, [field]: value }));
@@ -40,12 +70,66 @@ const SearchJobs: React.FC = () => {
       minRate: '',
       maxRate: '',
     });
+    setCurrentPage(1);
+  };
+
+  const fetchJobs = async (page: number = 1): Promise<void> => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Build query parameters
+      const queryParams = new URLSearchParams();
+      const token = getCookie('user_token');
+
+      if (filters.search) queryParams.append('search', filters.search);
+      if (filters.skills) queryParams.append('skills', filters.skills);
+      if (filters.location) queryParams.append('location', filters.location);
+      if (filters.minRate) queryParams.append('minRate', filters.minRate);
+      if (filters.maxRate) queryParams.append('maxRate', filters.maxRate);
+      queryParams.append('page', page.toString());
+      queryParams.append('limit', '10');
+
+      const response = await fetch(
+        `${
+          process.env.NEXT_PUBLIC_BASE_URL
+        }/api/freelancer/jobs?${queryParams.toString()}`,
+        {
+          method: 'GET',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      if (!response.ok) {
+        throw new Error('Failed to fetch jobs');
+      }
+
+      const data: JobsResponse = await response.json();
+
+      // Call the callback to update parent component
+      if (onJobsUpdate) {
+        onJobsUpdate(data.data, data.metadata);
+      }
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'An error occurred');
+      console.error('Error fetching jobs:', err);
+    } finally {
+      setLoading(false);
+    }
   };
 
   const handleSearch = (): void => {
-    // Search logic will be implemented later
-    console.log('Searching with filters:', filters);
+    setCurrentPage(1);
+    fetchJobs(1);
   };
+
+  // Fetch jobs on initial load
+  useEffect(() => {
+    fetchJobs(1);
+  }, []);
 
   return (
     <div className='mt-6'>
@@ -62,6 +146,7 @@ const SearchJobs: React.FC = () => {
               onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
                 handleFilterChange('search', e.target.value)
               }
+              onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
               className='w-full pl-12 pr-4 py-3 bg-gray-900/50 border border-gray-600 rounded-lg text-white placeholder-gray-500 focus:outline-none focus:border-green-500 transition-colors'
             />
           </div>
@@ -74,8 +159,9 @@ const SearchJobs: React.FC = () => {
           </button>
           <button
             onClick={handleSearch}
-            className='sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg font-semibold transition-all shadow-lg hover:shadow-green-500/50 cursor-pointer'>
-            Search Jobs
+            disabled={loading}
+            className='sm:w-auto px-8 py-3 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg font-semibold transition-all shadow-lg hover:shadow-green-500/50 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed'>
+            {loading ? 'Searching...' : 'Search Jobs'}
           </button>
         </div>
 
@@ -165,6 +251,13 @@ const SearchJobs: React.FC = () => {
             </div>
           </div>
         )}
+
+        {/* Error Message */}
+        {error && (
+          <div className='mt-4 p-3 bg-red-500/20 border border-red-500/50 rounded-lg text-red-400 text-sm'>
+            {error}
+          </div>
+        )}
       </div>
 
       {/* Active Filters Display */}
@@ -213,6 +306,13 @@ const SearchJobs: React.FC = () => {
           </span>
         )}
       </div>
+
+      {/* Loading State */}
+      {loading && (
+        <div className='mt-6 flex justify-center'>
+          <div className='animate-spin rounded-full h-10 w-10 border-b-2 border-green-500'></div>
+        </div>
+      )}
     </div>
   );
 };

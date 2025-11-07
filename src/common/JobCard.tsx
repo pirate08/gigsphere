@@ -8,7 +8,8 @@ interface CardProps {
   location: string;
   employmentType: 'full-time' | 'part-time' | 'contract' | 'internship';
   budget: number;
-  skills: string[];
+  // NOTE: Keep the type as string[] but the internal logic handles null/undefined
+  skills: string[] | undefined | null;
   createdAt: Date;
 }
 
@@ -21,6 +22,9 @@ const JobCard: React.FC<CardProps> = ({
   skills,
   createdAt,
 }) => {
+  // Use a fallback for the skills array
+  const safeSkills = skills ?? []; // <-- FIX: Ensures skills is an empty array if undefined/null
+
   // Format the date
   const formatDate = (date: Date): string => {
     const now = new Date();
@@ -102,16 +106,21 @@ const JobCard: React.FC<CardProps> = ({
       {/* Skills Section */}
       <div className='mb-4'>
         <div className='flex flex-wrap gap-2'>
-          {skills.slice(0, 6).map((skill, index) => (
-            <span
-              key={index}
-              className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-300 hover:bg-gray-600/50 hover:border-gray-500 transition-colors'>
-              {skill}
-            </span>
-          ))}
-          {skills.length > 6 && (
+          {safeSkills.slice(0, 6).map(
+            (
+              skill,
+              index // <-- Using safeSkills now
+            ) => (
+              <span
+                key={index}
+                className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-300 hover:bg-gray-600/50 hover:border-gray-500 transition-colors'>
+                {skill}
+              </span>
+            )
+          )}
+          {safeSkills.length > 6 && ( // <-- Using safeSkills now
             <span className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-400'>
-              +{skills.length - 6} more
+              +{safeSkills.length - 6} more
             </span>
           )}
         </div>
