@@ -3,7 +3,6 @@ import {
   FiMapPin,
   FiDollarSign,
   FiBriefcase,
-  FiLink,
   FiUser,
   FiMail,
 } from 'react-icons/fi';

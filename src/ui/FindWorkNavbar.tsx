@@ -67,22 +67,24 @@ const FindWorkNavbar = () => {
 
         {/* Desktop Buttons */}
         <div className='hidden md:flex items-center gap-4 text-sm'>
-          <Link href='/notification'>
-            <button className='group relative px-4 py-2 rounded-md hover:bg-blue-600 transition cursor-pointer'>
-              <IoIosNotifications className='text-xl' />
-              <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
-                Notification
-              </span>
-            </button>
-          </Link>
-          <Link href='/profile'>
-            <button className='group relative px-4 py-2 rounded-md hover:bg-green-600 transition cursor-pointer'>
-              <CgProfile className='text-xl' />
-              <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
-                Profile
-              </span>
-            </button>
-          </Link>
+          <div>
+            <Link href='/notification'>
+              <button className='group relative px-4 py-2 rounded-md hover:bg-blue-600 transition cursor-pointer'>
+                <IoIosNotifications className='text-xl' />
+                <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
+                  Notification
+                </span>
+              </button>
+            </Link>
+            <Link href='/profile'>
+              <button className='group relative px-4 py-2 rounded-md hover:bg-green-600 transition cursor-pointer'>
+                <CgProfile className='text-xl' />
+                <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
+                  Profile
+                </span>
+              </button>
+            </Link>
+          </div>
           <button
             className='group relative button-gradient cursor-pointer text-white px-4 py-2 rounded-md transition'
             onClick={handleLogout}>
