@@ -1,9 +1,12 @@
+'use client'
+
 import React from 'react';
 import { FiMapPin, FiDollarSign, FiBriefcase } from 'react-icons/fi';
 import { BiTime } from 'react-icons/bi';
 import Link from 'next/link';
 
 interface CardProps {
+  _id: string; // ADDED
   title: string;
   description: string;
   location: string;
@@ -12,9 +15,12 @@ interface CardProps {
   link: string;
   skills: string[] | undefined | null;
   createdAt: Date;
+  hasApplied?: boolean; // ADDED
+  onApplyClick: (jobId: string, jobTitle: string) => void; // ADDED
 }
 
 const JobCard: React.FC<CardProps> = ({
+  _id,
   title,
   description,
   location,
@@ -23,11 +29,11 @@ const JobCard: React.FC<CardProps> = ({
   skills,
   link,
   createdAt,
+  hasApplied = false,
+  onApplyClick,
 }) => {
-  // Use a fallback for the skills array
-  const safeSkills = skills ?? []; // <-- FIX: Ensures skills is an empty array if undefined/null
+  const safeSkills = skills ?? [];
 
-  // Format the date
   const formatDate = (date: Date): string => {
     const now = new Date();
     const diffTime = Math.abs(now.getTime() - date.getTime());
@@ -41,7 +47,6 @@ const JobCard: React.FC<CardProps> = ({
     return 'Just now';
   };
 
-  // Format employment type
   const formatEmploymentType = (type: string): string => {
     return type
       .split('-')
@@ -49,7 +54,6 @@ const JobCard: React.FC<CardProps> = ({
       .join(' ');
   };
 
-  // Get badge color based on employment type
   const getBadgeColor = (type: string): string => {
     switch (type) {
       case 'full-time':
@@ -65,17 +69,21 @@ const JobCard: React.FC<CardProps> = ({
     }
   };
 
+  const handleApplyClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    onApplyClick(_id, title);
+  };
+
   return (
     <div className='w-full bg-gray-800/50 backdrop-blur-sm border border-gray-700/50 hover:border-green-500/50 text-white rounded-xl p-4 sm:p-6 transition-all duration-300 hover:shadow-xl hover:shadow-green-500/10 group cursor-pointer'>
       {/* Header Section */}
       <div className='flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3 mb-4'>
         <div className='flex-1'>
-          {/* Title */}
           <h1 className='bg-gradient-to-r font-bold from-blue-400 to-green-500 bg-clip-text text-transparent text-xl sm:text-2xl mb-2 group-hover:from-green-400 group-hover:to-blue-400 transition-all'>
             {title}
           </h1>
 
-          {/* Meta Info Row */}
           <div className='flex flex-wrap items-center gap-3 text-sm text-gray-400'>
             <div className='flex items-center gap-1'>
               <BiTime className='text-base' />
@@ -88,7 +96,6 @@ const JobCard: React.FC<CardProps> = ({
           </div>
         </div>
 
-        {/* Employment Type Badge */}
         <div
           className={`px-3 py-1.5 rounded-full text-xs sm:text-sm font-medium border ${getBadgeColor(
             employmentType
@@ -108,19 +115,14 @@ const JobCard: React.FC<CardProps> = ({
       {/* Skills Section */}
       <div className='mb-4'>
         <div className='flex flex-wrap gap-2'>
-          {safeSkills.slice(0, 6).map(
-            (
-              skill,
-              index // <-- Using safeSkills now
-            ) => (
-              <span
-                key={index}
-                className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-300 hover:bg-gray-600/50 hover:border-gray-500 transition-colors'>
-                {skill}
-              </span>
-            )
-          )}
-          {safeSkills.length > 6 && ( // <-- Using safeSkills now
+          {safeSkills.slice(0, 6).map((skill, index) => (
+            <span
+              key={index}
+              className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-300 hover:bg-gray-600/50 hover:border-gray-500 transition-colors'>
+              {skill}
+            </span>
+          ))}
+          {safeSkills.length > 6 && (
             <span className='px-3 py-1 bg-gray-700/50 border border-gray-600 rounded-md text-xs sm:text-sm text-gray-400'>
               +{safeSkills.length - 6} more
             </span>
@@ -130,7 +132,6 @@ const JobCard: React.FC<CardProps> = ({
 
       {/* Footer Section */}
       <div className='flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 pt-4 border-t border-gray-700'>
-        {/* Budget */}
         <div className='flex items-center gap-2 text-green-400 font-semibold text-lg'>
           <FiDollarSign className='text-xl' />
           <span>${budget.toLocaleString()}</span>
@@ -143,8 +144,15 @@ const JobCard: React.FC<CardProps> = ({
               View Details
             </button>
           </Link>
-          <button className='flex-1 sm:flex-none px-4 sm:px-6 py-2 bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 rounded-lg text-sm font-medium transition-all shadow-lg hover:shadow-green-500/20 cursor-pointer'>
-            Apply Now
+          <button
+            onClick={handleApplyClick}
+            disabled={hasApplied}
+            className={`flex-1 sm:flex-none px-4 sm:px-6 py-2 rounded-lg text-sm font-medium transition-all shadow-lg ${
+              hasApplied
+                ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                : 'bg-gradient-to-r from-green-500 to-blue-500 hover:from-green-600 hover:to-blue-600 hover:shadow-green-500/20 cursor-pointer'
+            }`}>
+            {hasApplied ? 'Applied' : 'Apply Now'}
           </button>
         </div>
       </div>
