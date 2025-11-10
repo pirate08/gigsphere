@@ -76,7 +76,7 @@ const FindWorkNavbar = () => {
                 </span>
               </button>
             </Link>
-            <Link href='/profile'>
+            <Link href='/freelancer-profile'>
               <button className='group relative px-4 py-2 rounded-md hover:bg-green-600 transition cursor-pointer'>
                 <CgProfile className='text-xl' />
                 <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
@@ -144,7 +144,7 @@ const FindWorkNavbar = () => {
                 </span>
               </button>
             </Link>
-            <Link href='/profile' onClick={closeMenu}>
+            <Link href='/freelancer-profile' onClick={closeMenu}>
               <button className='w-full px-4 py-3 rounded-md hover:bg-green-600 transition cursor-pointer text-white border border-gray-600 flex items-center gap-2 justify-center'>
                 Profile
                 <span>
