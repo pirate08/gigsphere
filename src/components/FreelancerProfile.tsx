@@ -17,6 +17,7 @@ import ExperienceCard from '@/common/FreelancerProfile/ExperienceCard';
 import CertificateCard from '@/common/FreelancerProfile/CertificateCard';
 import PortfolioCard from '@/common/FreelancerProfile/PortfolioCard';
 import { useRouter } from 'next/navigation';
+import StatBox from '@/common/StatsBox';
 
 const FreelancerProfile: React.FC = () => {
   const profileData = {
@@ -84,6 +85,29 @@ const FreelancerProfile: React.FC = () => {
     },
   };
 
+  const Dashboard = [
+    {
+      id: 1,
+      name: 'Total Applied',
+      value: 5,
+    },
+    {
+      id: 2,
+      name: 'Pending Applications',
+      value: 4,
+    },
+    {
+      id: 3,
+      name: 'Accepted Applications',
+      value: 0,
+    },
+    {
+      id: 4,
+      name: 'Rejected Applications',
+      value: 1,
+    },
+  ];
+
   const router = useRouter();
 
   return (
@@ -125,6 +149,15 @@ const FreelancerProfile: React.FC = () => {
             <p className='text-gray-300 leading-relaxed text-sm sm:text-base'>
               {profileData.profile.description}
             </p>
+          </div>
+
+          {/* --Stats Box-- */}
+          <div className='mt-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 w-full'>
+            {Dashboard.map((dashboard) => (
+              <div key={dashboard.id}>
+                <StatBox value={dashboard.value} label={dashboard.name} />
+              </div>
+            ))}
           </div>
         </div>
 
