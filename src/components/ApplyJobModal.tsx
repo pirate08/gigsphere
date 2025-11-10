@@ -2,6 +2,7 @@
 
 import { getCookie } from 'cookies-next';
 import React, { useState } from 'react';
+import toast from 'react-hot-toast';
 import { FiX, FiCheck } from 'react-icons/fi';
 
 interface ApplyJobModalProps {
@@ -60,6 +61,7 @@ const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
 
       const data = await response.json();
       console.log('Application submitted successfully:', data);
+      toast.success('Application submitted successfully');
 
       // Call success callback
       if (onSuccess) {
