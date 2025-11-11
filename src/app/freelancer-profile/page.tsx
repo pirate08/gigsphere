@@ -25,11 +25,19 @@ interface FreelancerProfileProps {
   }[];
 }
 
+interface StatsProps {
+  totalApplied: number;
+  pendingApplications: number;
+  acceptedApplications: number;
+  rejectedApplications: number;
+}
+
 const Profile = async () => {
   // --Fetching the token--
   const cookieStore = await cookies();
   const token = cookieStore.get('user_token')?.value;
   let profileData: FreelancerProfileProps[] = [];
+  let dashboardStats: StatsProps | null = null;
   let error: string | null = null;
 
   if (!token) {
@@ -43,7 +51,7 @@ const Profile = async () => {
     );
   }
 
-  // --Fetch api goes here--
+  // --Fetch api goes here (Get profile data)--
   try {
     const response = await fetch(
       `${process.env.NEXT_PUBLIC_BASE_URL}/api/freelancer/profile`,
@@ -93,9 +101,48 @@ const Profile = async () => {
     error = 'Error in fetching data. Please try again.';
   }
 
+  // --Get Dashboard Stats--
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_BASE_URL}/api/freelancer/dashboard`,
+      {
+        method: 'GET',
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${token}`,
+        },
+        cache: 'no-store',
+      }
+    );
+
+    if (res.ok) {
+      const stats = await res.json();
+      dashboardStats = stats.jobStats;
+      // console.log(dashboardStats);
+    } else {
+      console.error('Failed to fetch profile:', res.status, res.statusText);
+      error = `Failed to fetch stats: ${res.statusText}`;
+    }
+  } catch (err) {
+    console.log('Error in fetching stats', err);
+    error = 'Error in fetching stats. Please try again';
+  }
+
   return (
     <div>
-      <FreelancerProfile profileData={profileData} error={error} />
+      <FreelancerProfile
+        profileData={profileData}
+        error={error}
+        stats={
+          dashboardStats || {
+            totalApplied: 0,
+            pendingApplications: 0,
+            acceptedApplications: 0,
+            rejectedApplications: 0,
+          }
+        }
+      />
     </div>
   );
 };

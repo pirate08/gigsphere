@@ -6,10 +6,10 @@ import { BsCalendar3 } from 'react-icons/bs';
 interface Experience {
   _id?: string;
   title: string;
-  company: string; // FIX 2: Change startDate to accept the Date object type from the parent.
-  startDate: Date; // FIX 2: Change endDate to accept Date object or undefined to match the parent.
-  endDate?: Date;
-  isCurrent: boolean; // Allow description to be optional to match the parent
+  company: string; // Allow Date or string, since it's common for API data to be passed as string
+  startDate: Date | string;
+  endDate?: Date | string | null; // Allow Date, string, or null/undefined
+  isCurrent: boolean;
   description?: string;
 }
 
@@ -18,16 +18,30 @@ interface ExperienceCardProps {
 }
 
 const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience }) => {
-  // Update formatDate to accept Date object or undefined
-  const formatDate = (date: Date | undefined): string => {
-    if (!date) return experience.isCurrent ? 'Present' : 'N/A';
-    // Ensure the Date object is valid
-    if (date instanceof Date && !isNaN(date.getTime())) {
+  // Update formatDate to accept Date object, string, or undefined/null
+  const formatDate = (dateValue: Date | string | null | undefined): string => {
+    if (!dateValue) return experience.isCurrent ? '' : 'N/A';
+
+    let date: Date; // 1. Check if it's already a Date object
+
+    if (dateValue instanceof Date) {
+      date = dateValue;
+    }
+    // 2. Otherwise, treat it as a string and attempt conversion
+    else if (typeof dateValue === 'string') {
+      date = new Date(dateValue);
+    } else {
+      // Should not happen with the union type, but for safety
+      return 'N/A';
+    } // 3. Ensure the converted Date object is valid
+
+    if (!isNaN(date.getTime())) {
       return date.toLocaleDateString('en-US', {
         month: 'short',
         year: 'numeric',
       });
     }
+
     return 'N/A';
   };
 
@@ -41,13 +55,12 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience }) => {
 
           <p className='text-blue-400 font-medium'>{experience.company}</p>
         </div>
-
         <div className='flex items-center gap-2 text-gray-400 text-sm'>
           <BsCalendar3 className='w-4 h-4' />
           <span>
-            {formatDate(experience.startDate)} -{formatDate(experience.endDate)}
+            {formatDate(experience.startDate)} -{' '}
+            {formatDate(experience.endDate)}
           </span>
-
           {experience.isCurrent && (
             <span className='px-2 py-0.5 bg-green-600/20 text-green-400 rounded text-xs border border-green-500/30'>
               Current
@@ -55,7 +68,6 @@ const ExperienceCard: React.FC<ExperienceCardProps> = ({ experience }) => {
           )}
         </div>
       </div>
-
       <p className='text-gray-300 text-sm leading-relaxed'>
         {experience.description}
       </p>

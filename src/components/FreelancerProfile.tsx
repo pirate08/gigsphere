@@ -43,12 +43,20 @@ interface FreelancerProfileProps {
   }[];
 }
 
+interface StatsProps {
+  totalApplied: number;
+  pendingApplications: number;
+  acceptedApplications: number;
+  rejectedApplications: number;
+}
+
 interface Props {
   profileData: FreelancerProfileProps[];
   error: string | null;
+  stats: StatsProps;
 }
 
-const FreelancerProfile: React.FC<Props> = ({ profileData, error }) => {
+const FreelancerProfile: React.FC<Props> = ({ profileData, error, stats }) => {
   const router = useRouter();
 
   // Handle error state
@@ -74,7 +82,7 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error }) => {
         <div className='text-center'>
           <p className='text-gray-400 text-xl mb-4'>No profile data found.</p>
           <button
-            onClick={() => router.push('/freelancer-profile/update')}
+            onClick={() => router.push('/freelancer-profile/create')}
             className='cursor-pointer px-4 py-2 rounded-md bg-green-900/100 hover:bg-green-800/100 text-white'>
             Create Profile
           </button>
@@ -85,29 +93,6 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error }) => {
 
   // Get the first profile (assuming single profile per user)
   const profile = profileData[0];
-
-  const Dashboard = [
-    {
-      id: 1,
-      name: 'Total Applied',
-      value: 5,
-    },
-    {
-      id: 2,
-      name: 'Pending Applications',
-      value: 4,
-    },
-    {
-      id: 3,
-      name: 'Accepted Applications',
-      value: 0,
-    },
-    {
-      id: 4,
-      name: 'Rejected Applications',
-      value: 1,
-    },
-  ];
 
   return (
     <div className='bg-black text-white min-h-screen py-10 px-4 sm:px-6 lg:px-8'>
@@ -152,11 +137,19 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error }) => {
 
           {/* --Stats Box-- */}
           <div className='mt-5 grid grid-cols-2 sm:grid-cols-2 md:grid-cols-4 gap-5 w-full'>
-            {Dashboard.map((dashboard) => (
-              <div key={dashboard.id}>
-                <StatBox value={dashboard.value} label={dashboard.name} />
-              </div>
-            ))}
+            <StatBox value={stats.totalApplied} label={'Total Applied'} />
+            <StatBox
+              value={stats.pendingApplications}
+              label={'Pending Applications'}
+            />
+            <StatBox
+              value={stats.acceptedApplications}
+              label={'Accepted Applications'}
+            />
+            <StatBox
+              value={stats.rejectedApplications}
+              label={'Rejected Applications'}
+            />
           </div>
         </div>
 
