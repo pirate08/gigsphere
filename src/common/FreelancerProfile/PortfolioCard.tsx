@@ -4,7 +4,7 @@ import React from 'react';
 import { BsBoxArrowUpRight } from 'react-icons/bs';
 
 interface Portfolio {
-  _id: string;
+  _id?: string;
   name: string;
   url: string;
   description: string;
