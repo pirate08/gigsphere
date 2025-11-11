@@ -1,8 +1,6 @@
-// UpdateProfileUI.tsx (Modified to use real data)
-
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import InputText from '@/common/FreelancerProfileUpdate/InputText';
 import TextArea from '@/common/FreelancerProfileUpdate/TextArea';
 import FormSection from '@/common/FreelancerProfileUpdate/FormSection';
@@ -11,7 +9,7 @@ import ExperienceItemEditable from '@/common/FreelancerProfileUpdate/ExperienceI
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 
-// Re-export interfaces for use in other files
+// --- Interfaces ---
 export interface PortfolioItem {
   _id: string;
   name: string;
@@ -33,92 +31,6 @@ export interface ExperienceItem {
   isCurrent: boolean;
   description: string;
 }
-
-// --- Initial State (Defined in Section 1) ---
-const API_RESPONSE_DATA = {
-  fullName: 'Himadri Shekhar Deb Goswami',
-  email: 'himadri&pritha@gmail.com',
-  avatar: 'H',
-  profile: {
-    _id: '6904b653ca4dc298bdd22c4f',
-    userId: '6903a9a9b6a416b367bbf60e',
-    description:
-      'Seasoned Full-Stack Developer specializing in MERN stack, delivering scalable web applications and intuitive user experiences for over 6 years.',
-    qualification: ['Bachelor of Science in Software Engineering'],
-    skills: [
-      'React',
-      'Node.js',
-      'MongoDB',
-      'TypeScript',
-      'AWS Lambda',
-      'Unit Testing (Jest)',
-    ],
-    yearsOfExperience: 6,
-    hourlyRate: 65,
-    location: 'Remote - Europe',
-    portfolio: [
-      {
-        name: 'Senior Collaborative Task Manager',
-        url: 'https://taskmanager.com',
-        description: 'Led development of new features.',
-        _id: '6905059a93225efd90add8fb',
-      },
-    ],
-    certificates: [
-      {
-        name: 'AWS Certified Developer – Associate',
-        issuer: 'Amazon Web Services',
-        date: '2023-09-01T00:00:00.000Z',
-        _id: '6904b653ca4dc298bdd22c52',
-      },
-      {
-        name: 'Advanced React Hooks',
-        issuer: 'Frontend Masters',
-        _id: '6904b653ca4dc298bdd22c53',
-      },
-    ],
-    experience: [
-      {
-        title: 'Senior Software Engineer',
-        company: 'Global Tech Solutions',
-        startDate: '2022-01-15T00:00:00.000Z',
-        endDate: null,
-        isCurrent: true,
-        description:
-          'Led a team of three developers in migrating legacy APIs to serverless architecture on AWS. Implemented CI/CD pipelines using GitHub Actions.',
-        _id: '6904b653ca4dc298bdd22c54',
-      },
-      {
-        title: 'Full Stack Developer',
-        company: 'Digital Innovators Co.',
-        startDate: '2019-03-01T00:00:00.000Z',
-        endDate: '2021-12-31T00:00:00.000Z',
-        isCurrent: false,
-        description:
-          'Built and maintained client-facing dashboards. Responsible for both frontend state management (Redux) and backend API development (Node/Express).',
-        _id: '6904b653ca4dc298bdd22c55',
-      },
-    ],
-  },
-};
-const profileData = API_RESPONSE_DATA.profile;
-
-const initialFormState: ProfileFormState = {
-  fullName: API_RESPONSE_DATA.fullName,
-  email: API_RESPONSE_DATA.email,
-  description: profileData.description,
-  qualification: profileData.qualification,
-  skills: profileData.skills,
-  yearsOfExperience: profileData.yearsOfExperience,
-  hourlyRate: profileData.hourlyRate,
-  location: profileData.location,
-  portfolio: profileData.portfolio as PortfolioItem[],
-  certificates: profileData.certificates as CertificateItem[],
-  experience: profileData.experience as ExperienceItem[],
-  newSkill: '',
-  newQualification: '',
-};
-
 interface ProfileFormState {
   fullName: string;
   email: string;
@@ -136,9 +48,66 @@ interface ProfileFormState {
 }
 // ---
 
+// --- Initial State (Default Empty State) ---
+const initialFormState: ProfileFormState = {
+  fullName: '',
+  email: '',
+  description: '',
+  qualification: [],
+  skills: [],
+  yearsOfExperience: 0,
+  hourlyRate: 0,
+  location: '',
+  portfolio: [],
+  certificates: [],
+  experience: [],
+  newSkill: '',
+  newQualification: '',
+};
+
 const UpdateProfileUI: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState<ProfileFormState>(initialFormState);
+  const [isLoading, setIsLoading] = useState(true);
+
+  useEffect(() => {
+    // Run once on component mount to retrieve stored data
+    const storedProfile = localStorage.getItem('freelancerProfileToEdit');
+
+    if (storedProfile) {
+      const profileData = JSON.parse(storedProfile);
+
+      // Map the fetched data to your form state structure
+      const newFormState = {
+        fullName: profileData.fullName || '',
+        email: profileData.email || '',
+        description:
+          profileData.profile?.description || profileData.description || '',
+        qualification:
+          profileData.profile?.qualification || profileData.qualification || [],
+        skills: profileData.profile?.skills || profileData.skills || [],
+        yearsOfExperience:
+          profileData.profile?.yearsOfExperience ||
+          profileData.yearsOfExperience ||
+          0,
+        hourlyRate:
+          profileData.profile?.hourlyRate || profileData.hourlyRate || 0,
+        location: profileData.profile?.location || profileData.location || '',
+        // Ensure complex arrays are initialized as empty arrays if null/undefined
+        portfolio:
+          profileData.profile?.portfolio || profileData.portfolio || [],
+        certificates:
+          profileData.profile?.certificates || profileData.certificates || [],
+        experience:
+          profileData.profile?.experience || profileData.experience || [],
+        newSkill: '',
+        newQualification: '',
+      };
+      setFormData(newFormState as ProfileFormState);
+    }
+    // End loading state once check is complete
+    setIsLoading(false);
+  }, []);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -150,7 +119,8 @@ const UpdateProfileUI: React.FC = () => {
     }));
   };
 
-  const handleAddSkill = () => {
+  const handleAddSkill = (e: React.MouseEvent) => {
+    e.preventDefault(); // Prevent form submission
     const skill = formData.newSkill.trim();
     if (skill && !formData.skills.includes(skill)) {
       setFormData((prev) => ({
@@ -168,10 +138,16 @@ const UpdateProfileUI: React.FC = () => {
     }));
   };
 
-  const handleEditListItem = (id: string, type: string) => {
-    alert(`Editing ${type} item with ID: ${id}`);
+  const handleRemoveQualification = (qualificationToRemove: string) => {
+    setFormData((prev) => ({
+      ...prev,
+      qualification: prev.qualification.filter(
+        (q) => q !== qualificationToRemove
+      ),
+    }));
   };
 
+  // Generic handler for removing list items with an _id property
   const handleRemoveListItem = (id: string, type: keyof ProfileFormState) => {
     setFormData((prev) => ({
       ...prev,
@@ -179,11 +155,27 @@ const UpdateProfileUI: React.FC = () => {
     }));
   };
 
+  // Placeholder for opening an edit modal/form
+  const handleEditListItem = (id: string, type: string) => {
+    alert(
+      `Editing ${type} item with ID: ${id}. This should open a modal/inline form.`
+    );
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     console.log('Submitting updated profile data:', formData);
+    // TODO: Add actual API call here to submit the data
     alert('Profile update simulated! Check console for data.');
   };
+
+  if (isLoading) {
+    return (
+      <div className='min-h-screen bg-black text-white flex items-center justify-center'>
+        <p className='text-lg text-gray-400'>Loading profile data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className='min-h-screen bg-black text-white flex justify-center py-10 px-4'>
@@ -228,6 +220,7 @@ const UpdateProfileUI: React.FC = () => {
               required
             />
           </FormSection>
+
           {/* --- 2. Rate, Experience, & Location Section --- */}
           <FormSection title='Professional Metrics'>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -261,7 +254,6 @@ const UpdateProfileUI: React.FC = () => {
           </FormSection>
 
           {/* --- 3. Skills and Qualifications Section --- */}
-
           <FormSection title='Skills & Education'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
               {/* Skills Input */}
@@ -282,9 +274,9 @@ const UpdateProfileUI: React.FC = () => {
                   />
 
                   <button
-                    type='submit'
-                    onSubmit={handleAddSkill}
-                    className='px-4  bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer'>
+                    type='button' // Fixed: Changed type to 'button'
+                    onClick={handleAddSkill} // Fixed: Use onClick to add skill
+                    className='px-4 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer'>
                     Add
                   </button>
                 </div>
@@ -299,6 +291,7 @@ const UpdateProfileUI: React.FC = () => {
                   ))}
                 </div>
               </div>
+
               {/* Education/Qualification Display */}
               <div>
                 <h3 className='text-lg font-semibold text-gray-300 mb-3'>
@@ -314,9 +307,7 @@ const UpdateProfileUI: React.FC = () => {
                       {/* Remove button for qualifications */}
                       <button
                         type='button'
-                        onClick={() => {
-                          /* logic to remove qualification */
-                        }}
+                        onClick={() => handleRemoveQualification(q)} // Fixed: Added removal logic
                         className='text-red-400 hover:text-red-300 text-sm cursor-pointer'>
                         &times;
                       </button>
@@ -326,6 +317,7 @@ const UpdateProfileUI: React.FC = () => {
 
                 <button
                   type='button'
+                  // TODO: This button needs a click handler to open a modal for adding qualifications
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Qualification
                 </button>
@@ -351,11 +343,12 @@ const UpdateProfileUI: React.FC = () => {
 
               <button
                 type='button'
+                // TODO: This button needs a click handler to open a modal for adding experience
                 className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                 + Add New Experience
               </button>
             </FormSection>
-            {/* Portfolio and Certificates in two columns on large screens */}
+
             <div className='lg:col-span-2 space-y-8'>
               <FormSection title='Portfolio'>
                 <div className='space-y-4'>
@@ -390,6 +383,7 @@ const UpdateProfileUI: React.FC = () => {
                 </div>
                 <button
                   type='button'
+                  // TODO: This button needs a click handler to open a modal for adding portfolio items
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Portfolio Item
                 </button>
@@ -429,6 +423,7 @@ const UpdateProfileUI: React.FC = () => {
                 </div>
                 <button
                   type='button'
+                  // TODO: This button needs a click handler to open a modal for adding certificates
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Certificate
                 </button>

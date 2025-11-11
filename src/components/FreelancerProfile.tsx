@@ -94,6 +94,20 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error, stats }) => {
   // Get the first profile (assuming single profile per user)
   const profile = profileData[0];
 
+  // --Storing the fetched data in localstorage--
+  const handleClickUpdate = () => {
+    const profileToEdit = profileData[0];
+
+    // --Stringify and save the complex object to localStorage--
+    localStorage.setItem(
+      'freelancerProfileToEdit',
+      JSON.stringify(profileToEdit)
+    );
+
+    // --Navigate to the update page--
+    router.push('/freelancer-profile/update');
+  };
+
   return (
     <div className='bg-black text-white min-h-screen py-10 px-4 sm:px-6 lg:px-8'>
       <div className='max-w-5xl mx-auto'>
@@ -235,7 +249,7 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error, stats }) => {
         {/* --Update button-- */}
         <div>
           <button
-            onClick={() => router.push('/freelancer-profile/update')}
+            onClick={handleClickUpdate}
             className='cursor-pointer px-4 py-2 rounded-md bg-green-900/100 hover:bg-green-800/100 text-white'>
             Update Profile
           </button>
