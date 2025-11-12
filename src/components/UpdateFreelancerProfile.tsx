@@ -11,6 +11,7 @@ import { useRouter } from 'next/navigation';
 import AddNewQualification, {
   QualificationItem,
 } from '@/ui/AddNewQualification';
+import AddNewExperience from '@/ui/AddNewExperience';
 
 // --- Interfaces ---
 export interface PortfolioItem {
@@ -74,6 +75,7 @@ const UpdateProfileUI: React.FC = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isQualificationModalOpen, setIsQualificationModalOpen] =
     useState(false);
+  const [isExperienceModelOpen, setIsExperienceModelOpen] = useState(false);
 
   useEffect(() => {
     // Run once on component mount to retrieve stored data
@@ -191,6 +193,14 @@ const UpdateProfileUI: React.FC = () => {
       }));
     }
     setIsQualificationModalOpen(false);
+  };
+
+  const handleSaveExperience = (newExperience: ExperienceItem) => {
+    setFormData((prev) => ({
+      ...prev,
+      experience: [...prev.experience, newExperience],
+    }));
+    setIsExperienceModelOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -374,7 +384,7 @@ const UpdateProfileUI: React.FC = () => {
 
               <button
                 type='button'
-                // TODO: This button needs a click handler to open a modal for adding experience
+                onClick={() => setIsExperienceModelOpen(true)}
                 className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                 + Add New Experience
               </button>
@@ -480,11 +490,16 @@ const UpdateProfileUI: React.FC = () => {
           </div>
         </form>
       </div>
-      {/* 👇 RENDER THE MODAL HERE */}
+      {/* 👇 RENDER THE MODALs HERE */}
       <AddNewQualification
         isOpen={isQualificationModalOpen}
         onClose={() => setIsQualificationModalOpen(false)}
         onSave={handleSaveQualification}
+      />
+      <AddNewExperience
+        isOpen={isExperienceModelOpen}
+        onClose={() => setIsExperienceModelOpen(false)}
+        onSave={handleSaveExperience}
       />
     </div>
   );
