@@ -12,6 +12,7 @@ import AddNewQualification, {
   QualificationItem,
 } from '@/ui/AddNewQualification';
 import AddNewExperience from '@/ui/AddNewExperience';
+import AddNewCertificate from '@/ui/AddNewCertificate';
 
 // --- Interfaces ---
 export interface PortfolioItem {
@@ -76,6 +77,7 @@ const UpdateProfileUI: React.FC = () => {
   const [isQualificationModalOpen, setIsQualificationModalOpen] =
     useState(false);
   const [isExperienceModelOpen, setIsExperienceModelOpen] = useState(false);
+  const [isCertificateModelOpen, setIsCertificateModelOpen] = useState(false);
 
   useEffect(() => {
     // Run once on component mount to retrieve stored data
@@ -180,6 +182,7 @@ const UpdateProfileUI: React.FC = () => {
     );
   };
 
+  // --Handle qualification save--
   const handleSaveQualification = (newQualification: QualificationItem) => {
     const qualificationName = newQualification.name;
 
@@ -195,12 +198,22 @@ const UpdateProfileUI: React.FC = () => {
     setIsQualificationModalOpen(false);
   };
 
+  // --Handle experience save--
   const handleSaveExperience = (newExperience: ExperienceItem) => {
     setFormData((prev) => ({
       ...prev,
       experience: [...prev.experience, newExperience],
     }));
     setIsExperienceModelOpen(false);
+  };
+
+  // --Handle experience save--
+  const handleSaveCertificate = (newCertificate: CertificateItem) => {
+    setFormData((prev) => ({
+      ...prev,
+      certificates: [...prev.certificates, newCertificate],
+    }));
+    setIsCertificateModelOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -464,7 +477,7 @@ const UpdateProfileUI: React.FC = () => {
                 </div>
                 <button
                   type='button'
-                  // TODO: This button needs a click handler to open a modal for adding certificates
+                  onClick={() => setIsCertificateModelOpen(true)}
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Certificate
                 </button>
@@ -500,6 +513,11 @@ const UpdateProfileUI: React.FC = () => {
         isOpen={isExperienceModelOpen}
         onClose={() => setIsExperienceModelOpen(false)}
         onSave={handleSaveExperience}
+      />
+      <AddNewCertificate
+        isOpen={isCertificateModelOpen}
+        onClose={() => setIsCertificateModelOpen(false)}
+        onSave={handleSaveCertificate}
       />
     </div>
   );

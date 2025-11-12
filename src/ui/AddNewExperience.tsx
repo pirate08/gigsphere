@@ -93,7 +93,7 @@ const AddNewExperience: React.FC<AddNewExperienceProps> = ({
     // Overlay (Fixed position, full screen, semi-transparent background)
     <div className='fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-70 backdrop-blur-sm p-4'>
       {/* Modal Content */}
-      <div className='bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[100vh] p-6 sm:p-8 transform transition-all duration-300 scale-100'>
+      <div className='bg-gray-800 border border-gray-700 rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] md:max-h-[85vh] overflow-y-auto p-4 sm:p-6 md:p-8 transform transition-all duration-300 scale-100'>
         <h2 className='text-2xl font-bold text-white mb-6 border-b border-gray-700 pb-3 flex items-center gap-2'>
           <svg
             xmlns='http://www.w3.org/2000/svg'
