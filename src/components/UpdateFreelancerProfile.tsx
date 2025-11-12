@@ -13,6 +13,7 @@ import AddNewQualification, {
 } from '@/ui/AddNewQualification';
 import AddNewExperience from '@/ui/AddNewExperience';
 import AddNewCertificate from '@/ui/AddNewCertificate';
+import AddNewPortfolioProject from '@/ui/AddNewPortfolioProject';
 
 // --- Interfaces ---
 export interface PortfolioItem {
@@ -78,6 +79,7 @@ const UpdateProfileUI: React.FC = () => {
     useState(false);
   const [isExperienceModelOpen, setIsExperienceModelOpen] = useState(false);
   const [isCertificateModelOpen, setIsCertificateModelOpen] = useState(false);
+  const [isPortfolioModelOpen, setIsPortfolioModelOpen] = useState(false);
 
   useEffect(() => {
     // Run once on component mount to retrieve stored data
@@ -207,13 +209,22 @@ const UpdateProfileUI: React.FC = () => {
     setIsExperienceModelOpen(false);
   };
 
-  // --Handle experience save--
+  // --Handle certificate save--
   const handleSaveCertificate = (newCertificate: CertificateItem) => {
     setFormData((prev) => ({
       ...prev,
       certificates: [...prev.certificates, newCertificate],
     }));
     setIsCertificateModelOpen(false);
+  };
+
+  // --Handle portfolio save--
+  const handleSavePortfolio = (newCertificate: PortfolioItem) => {
+    setFormData((prev) => ({
+      ...prev,
+      portfolio: [...prev.portfolio, newCertificate],
+    }));
+    setIsPortfolioModelOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -437,7 +448,7 @@ const UpdateProfileUI: React.FC = () => {
                 </div>
                 <button
                   type='button'
-                  // TODO: This button needs a click handler to open a modal for adding portfolio items
+                  onClick={() => setIsPortfolioModelOpen(true)}
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Portfolio Item
                 </button>
@@ -518,6 +529,11 @@ const UpdateProfileUI: React.FC = () => {
         isOpen={isCertificateModelOpen}
         onClose={() => setIsCertificateModelOpen(false)}
         onSave={handleSaveCertificate}
+      />
+      <AddNewPortfolioProject
+        isOpen={isPortfolioModelOpen}
+        onClose={() => setIsPortfolioModelOpen(false)}
+        onSave={handleSavePortfolio}
       />
     </div>
   );
