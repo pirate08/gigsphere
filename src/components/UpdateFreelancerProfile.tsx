@@ -14,6 +14,9 @@ import AddNewQualification, {
 import AddNewExperience from '@/ui/AddNewExperience';
 import AddNewCertificate from '@/ui/AddNewCertificate';
 import AddNewPortfolioProject from '@/ui/AddNewPortfolioProject';
+import InlineEditModal from '@/ui/InlineEditModel';
+import { getCookie } from 'cookies-next';
+import toast from 'react-hot-toast';
 
 // --- Interfaces ---
 export interface PortfolioItem {
@@ -80,6 +83,17 @@ const UpdateProfileUI: React.FC = () => {
   const [isExperienceModelOpen, setIsExperienceModelOpen] = useState(false);
   const [isCertificateModelOpen, setIsCertificateModelOpen] = useState(false);
   const [isPortfolioModelOpen, setIsPortfolioModelOpen] = useState(false);
+
+  // State for inline editing
+  const [editModal, setEditModal] = useState<{
+    isOpen: boolean;
+    type: 'experience' | 'portfolio' | 'certificate' | null;
+    data: any;
+  }>({
+    isOpen: false,
+    type: null,
+    data: null,
+  });
 
   useEffect(() => {
     // Run once on component mount to retrieve stored data
@@ -177,11 +191,53 @@ const UpdateProfileUI: React.FC = () => {
     }));
   };
 
-  // Placeholder for opening an edit modal/form
-  const handleEditListItem = (id: string, type: string) => {
-    alert(
-      `Editing ${type} item with ID: ${id}. This should open a modal/inline form.`
-    );
+  // Open edit modal for inline editing
+  const handleEditListItem = (
+    id: string,
+    type: 'experience' | 'portfolio' | 'certificate'
+  ) => {
+    let itemData;
+    if (type === 'experience') {
+      itemData = formData.experience.find((item) => item._id === id);
+    } else if (type === 'portfolio') {
+      itemData = formData.portfolio.find((item) => item._id === id);
+    } else if (type === 'certificate') {
+      itemData = formData.certificates.find((item) => item._id === id);
+    }
+
+    setEditModal({
+      isOpen: true,
+      type,
+      data: itemData,
+    });
+  };
+
+  // Handle saving edited item
+  const handleSaveEdit = (updatedItem: any) => {
+    if (editModal.type === 'experience') {
+      setFormData((prev) => ({
+        ...prev,
+        experience: prev.experience.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        ),
+      }));
+    } else if (editModal.type === 'portfolio') {
+      setFormData((prev) => ({
+        ...prev,
+        portfolio: prev.portfolio.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        ),
+      }));
+    } else if (editModal.type === 'certificate') {
+      setFormData((prev) => ({
+        ...prev,
+        certificates: prev.certificates.map((item) =>
+          item._id === updatedItem._id ? updatedItem : item
+        ),
+      }));
+    }
+
+    setEditModal({ isOpen: false, type: null, data: null });
   };
 
   // --Handle qualification save--
@@ -227,11 +283,69 @@ const UpdateProfileUI: React.FC = () => {
     setIsPortfolioModelOpen(false);
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  // API call to update profile
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log('Submitting updated profile data:', formData);
-    // TODO: Add actual API call here to submit the data
-    alert('Profile update simulated! Check console for data.');
+    // setIsSaving(true);
+
+    try {
+      // Get token from cookie
+      const token = getCookie('user_token');
+
+      // Prepare the data for API (exclude temporary fields)
+      const { newSkill, newQualification, ...dataToSend } = formData;
+
+      // Structure the data according to your API requirements
+      const requestBody = {
+        name: dataToSend.fullName,
+        email: dataToSend.email,
+
+        description: dataToSend.description,
+        qualification: dataToSend.qualification,
+        skills: dataToSend.skills,
+        yearsOfExperience: dataToSend.yearsOfExperience,
+        hourlyRate: dataToSend.hourlyRate,
+        location: dataToSend.location,
+
+        portfolio: dataToSend.portfolio,
+        certificates: dataToSend.certificates,
+        experience: dataToSend.experience,
+      };
+
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/freelancer/update-profile`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify(requestBody),
+        }
+      );
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error('Failed to update profile');
+      }
+
+      const data = await response.json();
+
+      // Update localStorage with the response
+      localStorage.setItem(
+        'freelancerProfileToEdit',
+        JSON.stringify(data.freelancer || data)
+      );
+
+      toast.success('Profile updated successfully!');
+      console.log('Updated profile:', data);
+
+      // Redirect to profile page
+      router.push('/freelancer-profile');
+    } catch (error: any) {
+      console.error('Error updating profile:', error);
+      toast.error(`Failed to update profile: ${error.message}`);
+    }
   };
 
   if (isLoading) {
@@ -339,8 +453,8 @@ const UpdateProfileUI: React.FC = () => {
                   />
 
                   <button
-                    type='button' // Fixed: Changed type to 'button'
-                    onClick={handleAddSkill} // Fixed: Use onClick to add skill
+                    type='button'
+                    onClick={handleAddSkill}
                     className='px-4 bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors cursor-pointer'>
                     Add
                   </button>
@@ -534,6 +648,15 @@ const UpdateProfileUI: React.FC = () => {
         isOpen={isPortfolioModelOpen}
         onClose={() => setIsPortfolioModelOpen(false)}
         onSave={handleSavePortfolio}
+      />
+
+      {/* Inline Edit Modal */}
+      <InlineEditModal
+        isOpen={editModal.isOpen}
+        onClose={() => setEditModal({ isOpen: false, type: null, data: null })}
+        onSave={handleSaveEdit}
+        itemType={editModal.type!}
+        initialData={editModal.data}
       />
     </div>
   );

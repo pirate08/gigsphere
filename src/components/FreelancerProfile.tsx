@@ -257,7 +257,7 @@ const FreelancerProfile: React.FC<Props> = ({ profileData, error, stats }) => {
         {/* --Back button-- */}
         <div>
           <button
-            onClick={() => router.back()}
+            onClick={() => router.push('/find-work')}
             className='cursor-pointer px-4 py-2 rounded-md bg-gray-900/100 hover:bg-gray-800/100 text-white'>
             Go Back
           </button>
