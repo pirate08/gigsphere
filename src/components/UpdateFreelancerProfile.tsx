@@ -8,6 +8,9 @@ import SkillBadgeEditable from '@/common/FreelancerProfileUpdate/SkillBadgeEdita
 import ExperienceItemEditable from '@/common/FreelancerProfileUpdate/ExperienceItemEditable';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import AddNewQualification, {
+  QualificationItem,
+} from '@/ui/AddNewQualification';
 
 // --- Interfaces ---
 export interface PortfolioItem {
@@ -69,6 +72,8 @@ const UpdateProfileUI: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState<ProfileFormState>(initialFormState);
   const [isLoading, setIsLoading] = useState(true);
+  const [isQualificationModalOpen, setIsQualificationModalOpen] =
+    useState(false);
 
   useEffect(() => {
     // Run once on component mount to retrieve stored data
@@ -108,6 +113,17 @@ const UpdateProfileUI: React.FC = () => {
     // End loading state once check is complete
     setIsLoading(false);
   }, []);
+
+  useEffect(() => {
+    if (!isLoading) {
+      // Exclude temporary fields before saving
+      const { newSkill, newQualification, ...dataToSave } = formData;
+      localStorage.setItem(
+        'freelancerProfileToEdit',
+        JSON.stringify(dataToSave)
+      );
+    }
+  }, [formData, isLoading]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -160,6 +176,21 @@ const UpdateProfileUI: React.FC = () => {
     alert(
       `Editing ${type} item with ID: ${id}. This should open a modal/inline form.`
     );
+  };
+
+  const handleSaveQualification = (newQualification: QualificationItem) => {
+    const qualificationName = newQualification.name;
+
+    if (
+      qualificationName &&
+      !formData.qualification.includes(qualificationName)
+    ) {
+      setFormData((prev) => ({
+        ...prev,
+        qualification: [...prev.qualification, qualificationName],
+      }));
+    }
+    setIsQualificationModalOpen(false);
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -317,7 +348,7 @@ const UpdateProfileUI: React.FC = () => {
 
                 <button
                   type='button'
-                  // TODO: This button needs a click handler to open a modal for adding qualifications
+                  onClick={() => setIsQualificationModalOpen(true)}
                   className='mt-3 w-full py-2 border border-blue-500 text-blue-500 rounded-lg hover:bg-blue-500/10 transition-colors cursor-pointer'>
                   + Add New Qualification
                 </button>
@@ -449,6 +480,12 @@ const UpdateProfileUI: React.FC = () => {
           </div>
         </form>
       </div>
+      {/* 👇 RENDER THE MODAL HERE */}
+      <AddNewQualification
+        isOpen={isQualificationModalOpen}
+        onClose={() => setIsQualificationModalOpen(false)}
+        onSave={handleSaveQualification}
+      />
     </div>
   );
 };
