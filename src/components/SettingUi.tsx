@@ -5,6 +5,7 @@ import { FaLock } from 'react-icons/fa6';
 import { useRouter } from 'next/navigation';
 import PasswordInput from '@/common/PasswordInput';
 import toast from 'react-hot-toast';
+import { getCookie, deleteCookie } from 'cookies-next';
 
 const SettingUi = () => {
   const router = useRouter();
@@ -18,8 +19,67 @@ const SettingUi = () => {
 
   // --Handle password change--
   const handlePasswordChange = async () => {
+    // --Validation--
+    if (!currentValue || !newValue || !confirmValue) {
+      toast.error('Please fill in all fields');
+    } else if (newValue !== confirmValue) {
+      toast.error('New password and confirm password do not match');
+    } else if (newValue.length < 6) {
+      toast.error('New password must be at least 6 characters long');
+    }
+
     setIsSubmitting(true);
-    console.log('Change Password Clicked');
+
+    const token = getCookie('user_token');
+    if (!token) {
+      toast.error('User not authenticated.');
+      setIsSubmitting(false);
+      return;
+    }
+
+    const loadingToast = toast.loading('Changing password...');
+
+    try {
+      const response = await fetch(
+        `${process.env.NEXT_PUBLIC_BASE_URL}/api/freelancer/profile/password`,
+        {
+          method: 'PATCH',
+          headers: {
+            'Content-Type': 'application/json',
+            Authorization: `Bearer ${token}`,
+          },
+          body: JSON.stringify({
+            currentPassword: currentValue,
+            newPassword: newValue,
+            confirmPassword: confirmValue,
+          }),
+        }
+      );
+
+      if (response.ok) {
+        toast.success('Password changed successfully!', { id: loadingToast });
+
+        // --Clear input fields--
+        setCurrentValue('');
+        setNewValue('');
+        setConfirmValue('');
+
+        // --Logout user--
+        deleteCookie('user_token');
+        deleteCookie('user_role');
+        router.push('/login');
+      } else {
+        const errorData = await response.json();
+        toast.error(`Update failed: ${errorData.message || 'Server Error'}`, {
+          id: loadingToast,
+        });
+      }
+    } catch (error) {
+      console.error('Error changing password:', error);
+      toast.error('An error occurred while changing the password');
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
