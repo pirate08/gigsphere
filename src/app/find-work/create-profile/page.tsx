@@ -1,11 +1,12 @@
+import CreateProfileUI from '@/components/CreateProfile';
 import React from 'react';
 
-const CreateJob = () => {
+const CreateProfile = () => {
   return (
     <div>
-      <h1>Here I am creating the job...</h1>
+      <CreateProfileUI />
     </div>
   );
 };
 
-export default CreateJob;
+export default CreateProfile;

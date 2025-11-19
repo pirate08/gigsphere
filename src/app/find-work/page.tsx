@@ -30,7 +30,7 @@ const FindWork = () => {
       // If not shown, set a timeout to display the modal after 30 seconds (30000ms)
       const timerId = setTimeout(() => {
         setIsModalOpen(true);
-      }, 10000);
+      }, 1000);
 
       // Cleanup the timer if the component unmounts or conditions change
       return () => clearTimeout(timerId);
