@@ -1,4 +1,3 @@
-import FindWorkNavbar from '@/ui/FindWorkNavbar';
 import NotificationList from '@/components/NotificationList';
 import React from 'react';
 import { cookies } from 'next/headers';
@@ -64,11 +63,6 @@ const Notification = async () => {
 
   return (
     <div className='bg-black min-h-screen text-white'>
-      {/* Navbar */}
-      <div>
-        <FindWorkNavbar />
-      </div>
-
       {/* Notification Content */}
       <div className='pt-20 md:pt-16'>
         <NotificationList notifications={notifications} error={error} />

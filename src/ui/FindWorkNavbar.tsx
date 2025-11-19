@@ -8,6 +8,7 @@ import { MdLogout } from 'react-icons/md';
 import { deleteCookie } from 'cookies-next';
 import { useRouter } from 'next/navigation';
 import { IoIosNotifications } from 'react-icons/io';
+import { IoSettings } from 'react-icons/io5';
 
 const FindWorkNavbar = () => {
   const router = useRouter();
@@ -84,6 +85,14 @@ const FindWorkNavbar = () => {
                 </span>
               </button>
             </Link>
+            <Link href='/settings'>
+              <button className='group relative px-4 py-2 rounded-md hover:bg-violet-600 transition cursor-pointer'>
+                <IoSettings className='text-xl' />
+                <span className='absolute -bottom-8 left-1/2 -translate-x-1/2 bg-gray-900 text-white text-xs px-2 py-1 rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 whitespace-nowrap pointer-events-none'>
+                  Settings
+                </span>
+              </button>
+            </Link>
           </div>
           <button
             className='group relative button-gradient cursor-pointer text-white px-4 py-2 rounded-md transition'
@@ -149,6 +158,14 @@ const FindWorkNavbar = () => {
                 Profile
                 <span>
                   <CgProfile className='text-xl' />
+                </span>
+              </button>
+            </Link>
+            <Link href='/settings' onClick={closeMenu}>
+              <button className='w-full px-4 py-3 rounded-md hover:bg-green-600 transition cursor-pointer text-white border border-gray-600 flex items-center gap-2 justify-center'>
+                Settings
+                <span>
+                  <IoSettings className='text-xl' />
                 </span>
               </button>
             </Link>
