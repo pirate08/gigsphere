@@ -39,14 +39,12 @@ const FindWork = () => {
 
   const handleCloseModal = () => {
     setIsModalOpen(false);
-    // Set a cookie so the modal doesn't appear again for this user
-    // You might want to set an expiration time (e.g., 1 year or a longer duration)
     setCookie('profile_prompt_shown', 'true', { maxAge: 60 * 60 * 24 * 365 });
   };
 
   const handleConfirmModal = () => {
     handleCloseModal();
-    router.push('/create-profile');
+    router.push('/find-work/create-profile');
   };
 
   return (
