@@ -1,3 +1,4 @@
+import Link from 'next/link';
 import React from 'react';
 import { FaMapMarkerAlt, FaUserTag, FaBriefcase } from 'react-icons/fa';
 import { MdChevronRight } from 'react-icons/md';
@@ -34,9 +35,12 @@ const FreelancerCard: React.FC<{ freelancer: Freelancer }> = ({
         </div>
         {/* Action Button */}
         <div className='mt-4 sm:mt-0'>
-          <button className='flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-500 transition-all whitespace-nowrap'>
-            View Profile <MdChevronRight className='w-5 h-5' />
-          </button>
+          <Link
+            href={`/client-dashboard/search-freelancers/profile/${freelancer._id}`}>
+            <button className='flex items-center gap-1.5 bg-green-600 text-white px-4 py-2 rounded-full font-semibold hover:bg-green-500 transition-all whitespace-nowrap cursor-pointer'>
+              View Profile <MdChevronRight className='w-5 h-5' />
+            </button>
+          </Link>
         </div>
       </div>
       <div className='mt-4 pt-4 border-t border-gray-700 flex flex-wrap gap-4 items-center'>
