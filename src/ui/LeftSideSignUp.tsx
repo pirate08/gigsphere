@@ -10,7 +10,7 @@ const SignupLeftCard = () => {
         <p className='mt-5 text-gray-300 max-w-md'>
           Join our community to connect with top-tier talent or discover
           exciting new projects. Our platform is designed to help you succeed,
-          whether you're building a dream team or a fulfilling career.
+          whether you&apos;re building a dream team or a fulfilling career.
         </p>
       </div>
       {/* --Process-- */}
