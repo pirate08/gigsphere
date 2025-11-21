@@ -8,6 +8,22 @@ import { getCookie } from 'cookies-next';
 import toast from 'react-hot-toast';
 import FreelancerCard from '@/ui/FreelancerCard';
 
+// 🚀 FIXED: New Interfaces for previously 'any' types
+interface Experience {
+  title: string;
+  company: string;
+  startDate: Date;
+  endDate?: Date;
+  isCurrent: boolean;
+  description?: string;
+}
+
+interface RecentApplication {
+  jobTitle: string;
+  appliedDate: string; // Assuming date is sent as a string
+  status: 'pending' | 'accepted' | 'rejected' | string;
+}
+
 // ✅ Complete interface matching backend response
 interface Freelancer {
   _id: string;
@@ -22,10 +38,12 @@ interface Freelancer {
   hourlyRate?: number;
   portfolio?: string[];
   certificates?: string[];
-  experience?: any[];
+  // ⭐️ FIXED LINE 25: experience?: any[]; -> Experience[]
+  experience?: Experience[];
   totalApplications: number;
   applicationsToYourJobs: number;
-  recentApplications: any[];
+  // ⭐️ FIXED LINE 28: recentApplications: any[]; -> RecentApplication[]
+  recentApplications: RecentApplication[];
 }
 
 interface Pagination {
@@ -40,7 +58,7 @@ const SearchFeatureUI = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [skillsFilter, setSkillsFilter] = useState<string[]>([]);
   const [isFilterOpen, setIsFilterOpen] = useState(false);
-  const [searchType, setSearchType] = useState<'name' | 'skills'>('skills'); // ✅ NEW: Toggle search type
+  const [searchType, setSearchType] = useState<'name' | 'skills'>('skills');
 
   // API State
   const [freelancers, setFreelancers] = useState<Freelancer[]>([]);
@@ -83,7 +101,7 @@ const SearchFeatureUI = () => {
       params.append('page', page.toString());
       params.append('limit', pagination.limit.toString());
 
-      // ✅ FIXED: Smart search - check what type of search is being done
+      // Smart search - check what type of search is being done
       if (searchType === 'name' && searchTerm.trim()) {
         params.append('name', searchTerm.trim());
       } else if (searchType === 'skills' && searchTerm.trim()) {
@@ -132,9 +150,15 @@ const SearchFeatureUI = () => {
           }
         );
         setCurrentPage(data.pagination.currentPage);
-      } catch (error: any) {
+        // ⭐️ FIXED LINE 135: catch (error: any) -> catch (error: unknown)
+      } catch (error: unknown) {
         console.error('Search error:', error);
-        toast.error(error.message || 'Error executing search.');
+        // Safely access the error message if the error is an instance of Error
+        let errorMessage = 'Error executing search.';
+        if (error instanceof Error) {
+          errorMessage = error.message;
+        }
+        toast.error(errorMessage);
         setFreelancers([]);
       } finally {
         setLoading(false);

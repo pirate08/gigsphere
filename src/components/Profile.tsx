@@ -40,15 +40,15 @@ const ProfileUI = ({ profileData }: ProfileUIProps) => {
 
   const initialUser = profileData[0];
 
+  const [editName, setEditName] = useState(initialUser?.name || '');
+  const [editEmail, setEditEmail] = useState(initialUser?.email || '');
+
   // Use a fallback just in case the array is empty
   if (!initialUser) {
     return (
       <div className='text-white text-center p-10'>No user data available.</div>
     );
   }
-
-  const [editName, setEditName] = useState(initialUser.name);
-  const [editEmail, setEditEmail] = useState(initialUser.email);
 
   // --Handling Api Call-
   const handleSave = async () => {

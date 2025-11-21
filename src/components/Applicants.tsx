@@ -40,7 +40,6 @@ interface ApplicantsProps {
 }
 
 const Applicants: React.FC<ApplicantsProps> = ({
-  jobId,
   jobTitle,
   initialApplicants,
   totalApplicants,
