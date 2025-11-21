@@ -53,11 +53,11 @@ const NotificationList: React.FC<NotificationListProps> = ({
   const getBadgeColor = (type: string) => {
     switch (type) {
       case 'APPLICATION_STATUS':
-        return 'bg-blue-500/20 border-blue-500/50 text-blue-400';
+        return 'bg-violet-500/20 border-violet-500/50 text-violet-400';
       case 'NEW_JOB_OPEN':
         return 'bg-green-500/20 border-green-500/50 text-green-400';
       case 'MESSAGE':
-        return 'bg-purple-500/20 border-purple-500/50 text-purple-400';
+        return 'bg-red-500/20 border-red-500/50 text-red-400';
       default:
         return 'bg-gray-500/20 border-gray-500/50 text-gray-400';
     }
