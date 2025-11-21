@@ -53,6 +53,11 @@ interface ProfileFormState {
   newSkill: string;
   newQualification: string;
 }
+
+// ✅ NEW: Union type for editable items
+type EditableItem = ExperienceItem | PortfolioItem | CertificateItem;
+type EditableItemType = 'experience' | 'portfolio' | 'certificate';
+
 // ---
 
 // --- Initial State (Default Empty State) ---
@@ -70,7 +75,6 @@ const initialFormState: ProfileFormState = {
   newQualification: '',
 };
 
-
 const CreateProfileUI: React.FC = () => {
   const router = useRouter();
   const [formData, setFormData] = useState<ProfileFormState>(initialFormState);
@@ -80,11 +84,11 @@ const CreateProfileUI: React.FC = () => {
   const [isCertificateModelOpen, setIsCertificateModelOpen] = useState(false);
   const [isPortfolioModelOpen, setIsPortfolioModelOpen] = useState(false);
 
-  // State for inline editing
+  // ✅ FIXED: Proper type for edit modal state
   const [editModal, setEditModal] = useState<{
     isOpen: boolean;
-    type: 'experience' | 'portfolio' | 'certificate' | null;
-    data: any;
+    type: EditableItemType | null;
+    data: EditableItem | null;
   }>({
     isOpen: false,
     type: null,
@@ -129,20 +133,23 @@ const CreateProfileUI: React.FC = () => {
     }));
   };
 
-  // Generic handler for removing list items with an _id property
-  const handleRemoveListItem = (id: string, type: keyof ProfileFormState) => {
+  // ✅ FIXED: Proper typing for list item removal
+  const handleRemoveListItem = (
+    id: string,
+    type: 'experience' | 'portfolio' | 'certificates'
+  ) => {
     setFormData((prev) => ({
       ...prev,
-      [type]: (prev[type] as any[]).filter((item) => item._id !== id),
+      [type]: (
+        prev[type] as Array<ExperienceItem | PortfolioItem | CertificateItem>
+      ).filter((item) => item._id !== id),
     }));
   };
 
-  // Open edit modal for inline editing
-  const handleEditListItem = (
-    id: string,
-    type: 'experience' | 'portfolio' | 'certificate'
-  ) => {
-    let itemData;
+  // ✅ FIXED: Proper typing for edit handler
+  const handleEditListItem = (id: string, type: EditableItemType) => {
+    let itemData: EditableItem | undefined;
+
     if (type === 'experience') {
       itemData = formData.experience.find((item) => item._id === id);
     } else if (type === 'portfolio') {
@@ -151,34 +158,36 @@ const CreateProfileUI: React.FC = () => {
       itemData = formData.certificates.find((item) => item._id === id);
     }
 
-    setEditModal({
-      isOpen: true,
-      type,
-      data: itemData,
-    });
+    if (itemData) {
+      setEditModal({
+        isOpen: true,
+        type,
+        data: itemData,
+      });
+    }
   };
 
-  // Handle saving edited item
-  const handleSaveEdit = (updatedItem: any) => {
+  // ✅ FIXED: Proper typing for save handler
+  const handleSaveEdit = (updatedItem: EditableItem) => {
     if (editModal.type === 'experience') {
       setFormData((prev) => ({
         ...prev,
         experience: prev.experience.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as ExperienceItem) : item
         ),
       }));
     } else if (editModal.type === 'portfolio') {
       setFormData((prev) => ({
         ...prev,
         portfolio: prev.portfolio.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as PortfolioItem) : item
         ),
       }));
     } else if (editModal.type === 'certificate') {
       setFormData((prev) => ({
         ...prev,
         certificates: prev.certificates.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as CertificateItem) : item
         ),
       }));
     }
@@ -221,10 +230,10 @@ const CreateProfileUI: React.FC = () => {
   };
 
   // --Handle portfolio save--
-  const handleSavePortfolio = (newCertificate: PortfolioItem) => {
+  const handleSavePortfolio = (newPortfolio: PortfolioItem) => {
     setFormData((prev) => ({
       ...prev,
-      portfolio: [...prev.portfolio, newCertificate],
+      portfolio: [...prev.portfolio, newPortfolio],
     }));
     setIsPortfolioModelOpen(false);
   };
@@ -237,8 +246,12 @@ const CreateProfileUI: React.FC = () => {
       // Get token from cookie
       const token = getCookie('user_token');
 
-      // Prepare the data for API (exclude temporary fields)
-      const { newSkill, newQualification, ...dataToSend } = formData;
+      // ✅ FIXED: Use destructuring with underscore prefix for unused variables
+      const {
+        newSkill: _newSkill,
+        newQualification: _newQualification,
+        ...dataToSend
+      } = formData;
 
       // Structure the data according to your API requirements
       const requestBody = {
@@ -248,7 +261,6 @@ const CreateProfileUI: React.FC = () => {
         yearsOfExperience: dataToSend.yearsOfExperience,
         hourlyRate: dataToSend.hourlyRate,
         location: dataToSend.location,
-
         portfolio: dataToSend.portfolio,
         certificates: dataToSend.certificates,
         experience: dataToSend.experience,
@@ -269,6 +281,7 @@ const CreateProfileUI: React.FC = () => {
       if (!response.ok) {
         const errorData = await response.json();
         toast.error(errorData.message || 'Failed to create profile');
+        return;
       }
 
       const data = await response.json();
@@ -278,9 +291,13 @@ const CreateProfileUI: React.FC = () => {
 
       // Redirect to profile page
       router.push('/freelancer-profile');
-    } catch (error: any) {
+    } catch (error) {
       console.error('Error in creating profile:', error);
-      toast.error(`Failed to create profile: ${error.message}`);
+      toast.error(
+        `Failed to create profile: ${
+          error instanceof Error ? error.message : 'Unknown error'
+        }`
+      );
     }
   };
 
@@ -391,10 +408,9 @@ const CreateProfileUI: React.FC = () => {
                       key={index}
                       className='bg-gray-700/50 p-3 rounded-lg flex justify-between items-center'>
                       <span className='text-gray-300 text-sm'>{q}</span>
-                      {/* Remove button for qualifications */}
                       <button
                         type='button'
-                        onClick={() => handleRemoveQualification(q)} // Fixed: Added removal logic
+                        onClick={() => handleRemoveQualification(q)}
                         className='text-red-400 hover:text-red-300 text-sm cursor-pointer'>
                         &times;
                       </button>

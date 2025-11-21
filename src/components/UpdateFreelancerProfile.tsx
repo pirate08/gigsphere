@@ -40,6 +40,10 @@ export interface ExperienceItem {
   isCurrent: boolean;
   description: string;
 }
+
+// NEW TYPE: Union of all editable list items
+type EditableItem = ExperienceItem | PortfolioItem | CertificateItem;
+
 interface ProfileFormState {
   fullName: string;
   email: string;
@@ -82,13 +86,12 @@ const UpdateProfileUI: React.FC = () => {
     useState(false);
   const [isExperienceModelOpen, setIsExperienceModelOpen] = useState(false);
   const [isCertificateModelOpen, setIsCertificateModelOpen] = useState(false);
-  const [isPortfolioModelOpen, setIsPortfolioModelOpen] = useState(false);
+  const [isPortfolioModelOpen, setIsPortfolioModelOpen] = useState(false); // State for inline editing
 
-  // State for inline editing
   const [editModal, setEditModal] = useState<{
     isOpen: boolean;
-    type: 'experience' | 'portfolio' | 'certificate' | null;
-    data: any;
+    type: 'experience' | 'portfolio' | 'certificate' | null; // FIX: Replaced 'any' with 'EditableItem | null'
+    data: EditableItem | null;
   }>({
     isOpen: false,
     type: null,
@@ -100,9 +103,8 @@ const UpdateProfileUI: React.FC = () => {
     const storedProfile = localStorage.getItem('freelancerProfileToEdit');
 
     if (storedProfile) {
-      const profileData = JSON.parse(storedProfile);
+      const profileData = JSON.parse(storedProfile); // Map the fetched data to your form state structure
 
-      // Map the fetched data to your form state structure
       const newFormState = {
         fullName: profileData.fullName || '',
         email: profileData.email || '',
@@ -117,8 +119,7 @@ const UpdateProfileUI: React.FC = () => {
           0,
         hourlyRate:
           profileData.profile?.hourlyRate || profileData.hourlyRate || 0,
-        location: profileData.profile?.location || profileData.location || '',
-        // Ensure complex arrays are initialized as empty arrays if null/undefined
+        location: profileData.profile?.location || profileData.location || '', // Ensure complex arrays are initialized as empty arrays if null/undefined
         portfolio:
           profileData.profile?.portfolio || profileData.portfolio || [],
         certificates:
@@ -129,15 +130,14 @@ const UpdateProfileUI: React.FC = () => {
         newQualification: '',
       };
       setFormData(newFormState as ProfileFormState);
-    }
-    // End loading state once check is complete
+    } // End loading state once check is complete
     setIsLoading(false);
   }, []);
 
   useEffect(() => {
     if (!isLoading) {
-      // Exclude temporary fields before saving
-      const { newSkill, newQualification, ...dataToSave } = formData;
+      // FIX: Used _ to denote unused temporary fields (newSkill, newQualification)
+      const { newSkill: _, newQualification: __, ...dataToSave } = formData;
       localStorage.setItem(
         'freelancerProfileToEdit',
         JSON.stringify(dataToSave)
@@ -181,17 +181,15 @@ const UpdateProfileUI: React.FC = () => {
         (q) => q !== qualificationToRemove
       ),
     }));
-  };
+  }; // Generic handler for removing list items with an _id property
 
-  // Generic handler for removing list items with an _id property
   const handleRemoveListItem = (id: string, type: keyof ProfileFormState) => {
     setFormData((prev) => ({
-      ...prev,
-      [type]: (prev[type] as any[]).filter((item) => item._id !== id),
+      ...prev, // FIX: Asserted type as EditableItem[] to fix 'Unexpected any'
+      [type]: (prev[type] as EditableItem[]).filter((item) => item._id !== id),
     }));
-  };
+  }; // Open edit modal for inline editing
 
-  // Open edit modal for inline editing
   const handleEditListItem = (
     id: string,
     type: 'experience' | 'portfolio' | 'certificate'
@@ -208,39 +206,37 @@ const UpdateProfileUI: React.FC = () => {
     setEditModal({
       isOpen: true,
       type,
-      data: itemData,
+      data: itemData as EditableItem, // Cast to EditableItem for state
     });
-  };
+  }; // Handle saving edited item // FIX: Replaced 'any' with 'EditableItem'
 
-  // Handle saving edited item
-  const handleSaveEdit = (updatedItem: any) => {
+  const handleSaveEdit = (updatedItem: EditableItem) => {
     if (editModal.type === 'experience') {
       setFormData((prev) => ({
         ...prev,
         experience: prev.experience.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as ExperienceItem) : item
         ),
       }));
     } else if (editModal.type === 'portfolio') {
       setFormData((prev) => ({
         ...prev,
         portfolio: prev.portfolio.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as PortfolioItem) : item
         ),
       }));
     } else if (editModal.type === 'certificate') {
       setFormData((prev) => ({
         ...prev,
         certificates: prev.certificates.map((item) =>
-          item._id === updatedItem._id ? updatedItem : item
+          item._id === updatedItem._id ? (updatedItem as CertificateItem) : item
         ),
       }));
     }
 
     setEditModal({ isOpen: false, type: null, data: null });
-  };
+  }; // --Handle qualification save--
 
-  // --Handle qualification save--
   const handleSaveQualification = (newQualification: QualificationItem) => {
     const qualificationName = newQualification.name;
 
@@ -254,48 +250,40 @@ const UpdateProfileUI: React.FC = () => {
       }));
     }
     setIsQualificationModalOpen(false);
-  };
+  }; // --Handle experience save--
 
-  // --Handle experience save--
   const handleSaveExperience = (newExperience: ExperienceItem) => {
     setFormData((prev) => ({
       ...prev,
       experience: [...prev.experience, newExperience],
     }));
     setIsExperienceModelOpen(false);
-  };
+  }; // --Handle certificate save--
 
-  // --Handle certificate save--
   const handleSaveCertificate = (newCertificate: CertificateItem) => {
     setFormData((prev) => ({
       ...prev,
       certificates: [...prev.certificates, newCertificate],
     }));
     setIsCertificateModelOpen(false);
-  };
+  }; // --Handle portfolio save--
 
-  // --Handle portfolio save--
   const handleSavePortfolio = (newCertificate: PortfolioItem) => {
     setFormData((prev) => ({
       ...prev,
       portfolio: [...prev.portfolio, newCertificate],
     }));
     setIsPortfolioModelOpen(false);
-  };
+  }; // API call to update profile
 
-  // API call to update profile
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    // setIsSaving(true);
-
+    e.preventDefault(); // setIsSaving(true);
     try {
       // Get token from cookie
       const token = getCookie('user_token');
 
-      // Prepare the data for API (exclude temporary fields)
-      const { newSkill, newQualification, ...dataToSend } = formData;
+      const { newSkill: _, newQualification: __, ...dataToSend } = formData;
 
-      // Structure the data according to your API requirements
       const requestBody = {
         name: dataToSend.fullName,
         email: dataToSend.email,
@@ -325,26 +313,30 @@ const UpdateProfileUI: React.FC = () => {
       );
 
       if (!response.ok) {
-        const errorData = await response.json();
+        // FIX: Removed unused 'errorData' variable
+        await response.json();
         toast.error('Failed to update profile');
       }
 
-      const data = await response.json();
+      const data = await response.json(); // Update localStorage with the response
 
-      // Update localStorage with the response
       localStorage.setItem(
         'freelancerProfileToEdit',
         JSON.stringify(data.freelancer || data)
       );
 
       toast.success('Profile updated successfully!');
-      console.log('Updated profile:', data);
+      console.log('Updated profile:', data); // Redirect to profile page
 
-      // Redirect to profile page
-      router.push('/freelancer-profile');
-    } catch (error: any) {
+      router.push('/freelancer-profile'); // FIX: Changed error: any to error: unknown and safely extract message
+    } catch (error: unknown) {
       console.error('Error updating profile:', error);
-      toast.error(`Failed to update profile: ${error.message}`);
+      const errorMessage =
+        error instanceof Error
+          ? error.message
+          : 'An unexpected error occurred.';
+
+      toast.error(`Failed to update profile: ${errorMessage}`);
     }
   };
 
@@ -362,11 +354,9 @@ const UpdateProfileUI: React.FC = () => {
         <h1 className='text-4xl font-bold text-center bg-gradient-to-r from-blue-400 via-purple-400 to-green-400 bg-clip-text text-transparent'>
           Update Your Profile
         </h1>
-
         <p className='text-gray-400 text-center text-sm md:text-md'>
           Review and update your professional information.
         </p>
-
         <form onSubmit={handleSubmit} className='space-y-8'>
           {/* --- 1. Basic Information Section --- */}
           <FormSection title='Basic Information'>
@@ -379,7 +369,6 @@ const UpdateProfileUI: React.FC = () => {
                 onChange={handleChange}
                 required
               />
-
               <InputText
                 id='email'
                 label='Email Address'
@@ -399,7 +388,6 @@ const UpdateProfileUI: React.FC = () => {
               required
             />
           </FormSection>
-
           {/* --- 2. Rate, Experience, & Location Section --- */}
           <FormSection title='Professional Metrics'>
             <div className='grid grid-cols-1 md:grid-cols-3 gap-6'>
@@ -411,7 +399,6 @@ const UpdateProfileUI: React.FC = () => {
                 onChange={handleChange}
                 required
               />
-
               <InputText
                 id='yearsOfExperience'
                 label='Years of Experience'
@@ -420,7 +407,6 @@ const UpdateProfileUI: React.FC = () => {
                 onChange={handleChange}
                 required
               />
-
               <InputText
                 id='location'
                 label='Location/Timezone'
@@ -431,7 +417,6 @@ const UpdateProfileUI: React.FC = () => {
               />
             </div>
           </FormSection>
-
           {/* --- 3. Skills and Qualifications Section --- */}
           <FormSection title='Skills & Education'>
             <div className='grid grid-cols-1 md:grid-cols-2 gap-8'>
@@ -440,7 +425,6 @@ const UpdateProfileUI: React.FC = () => {
                 <h3 className='text-lg font-semibold text-gray-300 mb-3'>
                   Skills
                 </h3>
-
                 <div className='flex gap-2 mb-4'>
                   <InputText
                     id='newSkill'
@@ -451,7 +435,6 @@ const UpdateProfileUI: React.FC = () => {
                     placeholder='Add a new skill'
                     className='flex-grow'
                   />
-
                   <button
                     type='button'
                     onClick={handleAddSkill}
@@ -470,7 +453,6 @@ const UpdateProfileUI: React.FC = () => {
                   ))}
                 </div>
               </div>
-
               {/* Education/Qualification Display */}
               <div>
                 <h3 className='text-lg font-semibold text-gray-300 mb-3'>
@@ -484,9 +466,10 @@ const UpdateProfileUI: React.FC = () => {
                       className='bg-gray-700/50 p-3 rounded-lg flex justify-between items-center'>
                       <span className='text-gray-300 text-sm'>{q}</span>
                       {/* Remove button for qualifications */}
+
                       <button
                         type='button'
-                        onClick={() => handleRemoveQualification(q)} // Fixed: Added removal logic
+                        onClick={() => handleRemoveQualification(q)}
                         className='text-red-400 hover:text-red-300 text-sm cursor-pointer'>
                         &times;
                       </button>
@@ -503,9 +486,7 @@ const UpdateProfileUI: React.FC = () => {
               </div>
             </div>
           </FormSection>
-
           {/* --- 4. Dynamic Sections (Experience, Portfolio, Certificates) --- */}
-
           <div className='grid grid-cols-1 lg:grid-cols-3 gap-8'>
             {/* Experience */}
             <FormSection title='Experience (Jobs)' className='lg:col-span-3'>
@@ -527,7 +508,6 @@ const UpdateProfileUI: React.FC = () => {
                 + Add New Experience
               </button>
             </FormSection>
-
             <div className='lg:col-span-2 space-y-8'>
               <FormSection title='Portfolio'>
                 <div className='space-y-4'>
@@ -535,31 +515,35 @@ const UpdateProfileUI: React.FC = () => {
                     <div
                       key={p._id}
                       className='bg-gray-700/50 p-4 rounded-lg border border-gray-600 flex justify-between items-start sm:items-center'>
-                      <Link href={p.url}>
+                      <Link href={p.url} className='flex-1'>
                         <h1 className='text-lg'>{p.name}</h1>
+
                         <p className='mt-3 text-gray-300 text-md'>
                           {p.description}
                         </p>
                       </Link>
-                      <div className='flex gap-2'>
+
+                      <div className='flex gap-2 ml-4'>
                         <button
                           type='button'
                           onClick={() => handleEditListItem(p._id, 'portfolio')}
                           className='text-blue-400 hover:text-blue-300 text-sm cursor-pointer'>
                           Edit
                         </button>
+
                         <button
                           type='button'
                           onClick={() =>
                             handleRemoveListItem(p._id, 'portfolio')
                           }
                           className='text-red-400 hover:text-red-300 text-sm cursor-pointer'>
-                          Remove
+                          Remove  {' '}
                         </button>
                       </div>
                     </div>
                   ))}
                 </div>
+
                 <button
                   type='button'
                   onClick={() => setIsPortfolioModelOpen(true)}
@@ -588,6 +572,7 @@ const UpdateProfileUI: React.FC = () => {
                           className='text-blue-400 hover:text-blue-300 cursor-pointer'>
                           Edit
                         </button>
+
                         <button
                           type='button'
                           onClick={() =>
@@ -600,6 +585,7 @@ const UpdateProfileUI: React.FC = () => {
                     </div>
                   ))}
                 </div>
+
                 <button
                   type='button'
                   onClick={() => setIsCertificateModelOpen(true)}
@@ -634,22 +620,24 @@ const UpdateProfileUI: React.FC = () => {
         onClose={() => setIsQualificationModalOpen(false)}
         onSave={handleSaveQualification}
       />
+
       <AddNewExperience
         isOpen={isExperienceModelOpen}
         onClose={() => setIsExperienceModelOpen(false)}
         onSave={handleSaveExperience}
       />
+
       <AddNewCertificate
         isOpen={isCertificateModelOpen}
         onClose={() => setIsCertificateModelOpen(false)}
         onSave={handleSaveCertificate}
       />
+
       <AddNewPortfolioProject
         isOpen={isPortfolioModelOpen}
         onClose={() => setIsPortfolioModelOpen(false)}
         onSave={handleSavePortfolio}
       />
-
       {/* Inline Edit Modal */}
       <InlineEditModal
         isOpen={editModal.isOpen}
