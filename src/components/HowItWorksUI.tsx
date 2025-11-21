@@ -104,7 +104,8 @@ const HowItWorksUI = () => {
               <h3 className='text-xl font-semibold mb-3'>Submit Proposals</h3>
               <p className='text-gray-400'>
                 Send tailored proposals highlighting how you can solve the
-                client's problem. Get hired and start earning on your terms.
+                client&apos;s problem. Get hired and start earning on your
+                terms.
               </p>
             </div>
           </div>
