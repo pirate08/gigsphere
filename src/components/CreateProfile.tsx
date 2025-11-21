@@ -246,12 +246,10 @@ const CreateProfileUI: React.FC = () => {
       // Get token from cookie
       const token = getCookie('user_token');
 
-      // ✅ FIXED: Use destructuring with underscore prefix for unused variables
-      const {
-        newSkill: _newSkill,
-        newQualification: _newQualification,
-        ...dataToSend
-      } = formData;
+      const { newSkill, newQualification, ...dataToSend } = formData;
+
+      void newSkill;
+      void newQualification;
 
       // Structure the data according to your API requirements
       const requestBody = {
