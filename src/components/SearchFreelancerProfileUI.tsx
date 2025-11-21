@@ -59,7 +59,7 @@ const SearchFreelancerProfileUI: React.FC<SearchFreelancerProfileUIProps> = ({
           <button
             onClick={() => router.back()}
             className='text-cyan-400 hover:text-cyan-300 transition-colors flex items-center gap-2 text-sm cursor-pointer'>
-            ← Back to Search
+            ← Back to Search Results
           </button>
         </div>
       </div>
