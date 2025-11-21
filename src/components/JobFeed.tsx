@@ -29,9 +29,6 @@ const JobFeed = () => {
   const [metadata, setMetadata] = useState<Metadata | null>(null);
   // 1. New State for current page
   const [currentPage, setCurrentPage] = useState<number>(1);
-  const [fetchJobsFunction, setFetchJobsFunction] = useState<
-    (() => void) | null
-  >(null);
 
   const handleJobsUpdate = (fetchedJobs: Job[], fetchedMetadata: Metadata) => {
     setJobs(fetchedJobs);

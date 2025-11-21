@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import InputText from '@/common/FreelancerProfileUpdate/InputText';
 import TextArea from '@/common/FreelancerProfileUpdate/TextArea';
 import FormSection from '@/common/FreelancerProfileUpdate/FormSection';
@@ -69,6 +69,7 @@ const initialFormState: ProfileFormState = {
   newSkill: '',
   newQualification: '',
 };
+
 
 const CreateProfileUI: React.FC = () => {
   const router = useRouter();

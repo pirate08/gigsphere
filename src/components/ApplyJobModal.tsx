@@ -71,8 +71,10 @@ const ApplyJobModal: React.FC<ApplyJobModalProps> = ({
       // Reset form and close modal
       setCoverLetter('');
       onClose();
-    } catch (err: any) {
-      setError(err.message || 'Something went wrong. Please try again.');
+    } catch (err: unknown) {
+      const errorMessage =
+        (err as Error)?.message || 'Something went wrong. Please try again.';
+      setError(errorMessage);
     } finally {
       setIsSubmitting(false);
     }
