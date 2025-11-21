@@ -2,13 +2,40 @@
 
 import React, { useState, useEffect } from 'react';
 
+// Define types for each item (matching the parent component's interfaces)
+interface ExperienceData {
+  _id: string;
+  title: string;
+  company: string;
+  startDate: string;
+  endDate?: string | null;
+  isCurrent: boolean;
+  description: string;
+}
+
+interface PortfolioData {
+  _id: string;
+  name: string;
+  url: string;
+  description: string;
+}
+
+interface CertificateData {
+  _id: string;
+  name: string;
+  issuer?: string;
+  date?: string;
+}
+
+type ItemData = ExperienceData | PortfolioData | CertificateData;
+
 // Generic props for different item types
 interface InlineEditModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (updatedItem: any) => void;
+  onSave: (updatedItem: ItemData) => void;
   itemType: 'experience' | 'portfolio' | 'certificate';
-  initialData: any;
+  initialData: ItemData | null;
 }
 
 const InlineEditModal: React.FC<InlineEditModalProps> = ({
@@ -18,7 +45,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
   itemType,
   initialData,
 }) => {
-  const [formData, setFormData] = useState<any>({});
+  const [formData, setFormData] = useState<ItemData | null>(initialData);
   const [error, setError] = useState('');
 
   useEffect(() => {
@@ -27,7 +54,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
     }
   }, [isOpen, initialData]);
 
-  if (!isOpen) return null;
+  if (!isOpen || !formData) return null;
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -36,16 +63,22 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
 
     if (type === 'checkbox') {
       const checked = (e.target as HTMLInputElement).checked;
-      setFormData((prev: any) => ({
-        ...prev,
-        [name]: checked,
-        ...(name === 'isCurrent' && checked ? { endDate: null } : {}),
-      }));
+      setFormData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          [name]: checked,
+          ...(name === 'isCurrent' && checked ? { endDate: null } : {}),
+        };
+      });
     } else {
-      setFormData((prev: any) => ({
-        ...prev,
-        [name]: value,
-      }));
+      setFormData((prev) => {
+        if (!prev) return prev;
+        return {
+          ...prev,
+          [name]: value,
+        };
+      });
     }
   };
 
@@ -53,29 +86,34 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
     e.preventDefault();
     setError('');
 
+    if (!formData) return;
+
     // Validation based on type
     if (itemType === 'experience') {
+      const data = formData as ExperienceData;
       if (
-        !formData.title?.trim() ||
-        !formData.company?.trim() ||
-        !formData.startDate?.trim()
+        !data.title?.trim() ||
+        !data.company?.trim() ||
+        !data.startDate?.trim()
       ) {
         setError('Title, Company, and Start Date are required.');
         return;
       }
-      if (!formData.isCurrent && !formData.endDate?.trim()) {
+      if (!data.isCurrent && !data.endDate?.trim()) {
         setError(
           'Please provide an End Date or check "Currently working here."'
         );
         return;
       }
     } else if (itemType === 'portfolio') {
-      if (!formData.name?.trim() || !formData.url?.trim()) {
+      const data = formData as PortfolioData;
+      if (!data.name?.trim() || !data.url?.trim()) {
         setError('Project Name and URL are required.');
         return;
       }
     } else if (itemType === 'certificate') {
-      if (!formData.name?.trim()) {
+      const data = formData as CertificateData;
+      if (!data.name?.trim()) {
         setError('Certificate Name is required.');
         return;
       }
@@ -88,6 +126,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
   const renderFields = () => {
     switch (itemType) {
       case 'experience':
+        const expData = formData as ExperienceData;
         return (
           <>
             <div>
@@ -97,7 +136,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='text'
                 name='title'
-                value={formData.title || ''}
+                value={expData.title || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                 required
@@ -111,7 +150,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='text'
                 name='company'
-                value={formData.company || ''}
+                value={expData.company || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                 required
@@ -126,24 +165,24 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
                 <input
                   type='date'
                   name='startDate'
-                  value={formData.startDate || ''}
+                  value={expData.startDate || ''}
                   onChange={handleChange}
                   className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                   required
                 />
               </div>
 
-              <div className={formData.isCurrent ? 'opacity-50' : ''}>
+              <div className={expData.isCurrent ? 'opacity-50' : ''}>
                 <label className='block text-sm text-gray-300 mb-1'>
                   End Date
                 </label>
                 <input
                   type='date'
                   name='endDate'
-                  value={formData.endDate || ''}
+                  value={expData.endDate || ''}
                   onChange={handleChange}
                   className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
-                  disabled={formData.isCurrent}
+                  disabled={expData.isCurrent}
                 />
               </div>
             </div>
@@ -152,7 +191,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='checkbox'
                 name='isCurrent'
-                checked={formData.isCurrent || false}
+                checked={expData.isCurrent || false}
                 onChange={handleChange}
                 className='w-4 h-4 text-blue-600 bg-gray-700 border-gray-600 rounded'
               />
@@ -167,7 +206,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               </label>
               <textarea
                 name='description'
-                value={formData.description || ''}
+                value={expData.description || ''}
                 onChange={handleChange}
                 rows={4}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white resize-none'
@@ -177,6 +216,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
         );
 
       case 'portfolio':
+        const portData = formData as PortfolioData;
         return (
           <>
             <div>
@@ -186,7 +226,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='text'
                 name='name'
-                value={formData.name || ''}
+                value={portData.name || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                 required
@@ -200,7 +240,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='url'
                 name='url'
-                value={formData.url || ''}
+                value={portData.url || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                 required
@@ -213,7 +253,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               </label>
               <textarea
                 name='description'
-                value={formData.description || ''}
+                value={portData.description || ''}
                 onChange={handleChange}
                 rows={4}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white resize-none'
@@ -223,6 +263,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
         );
 
       case 'certificate':
+        const certData = formData as CertificateData;
         return (
           <>
             <div>
@@ -232,7 +273,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='text'
                 name='name'
-                value={formData.name || ''}
+                value={certData.name || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
                 required
@@ -244,7 +285,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='text'
                 name='issuer'
-                value={formData.issuer || ''}
+                value={certData.issuer || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
               />
@@ -257,7 +298,7 @@ const InlineEditModal: React.FC<InlineEditModalProps> = ({
               <input
                 type='date'
                 name='date'
-                value={formData.date || ''}
+                value={certData.date || ''}
                 onChange={handleChange}
                 className='w-full px-4 py-2 bg-gray-900 border border-gray-700 rounded-lg text-white'
               />
