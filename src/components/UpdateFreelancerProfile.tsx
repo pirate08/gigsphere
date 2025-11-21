@@ -137,7 +137,10 @@ const UpdateProfileUI: React.FC = () => {
   useEffect(() => {
     if (!isLoading) {
       // FIX: Used _ to denote unused temporary fields (newSkill, newQualification)
-      const { newSkill: _, newQualification: __, ...dataToSave } = formData;
+      const { newSkill, newQualification, ...dataToSave } = formData;
+
+      void newSkill;
+      void newQualification;
       localStorage.setItem(
         'freelancerProfileToEdit',
         JSON.stringify(dataToSave)
@@ -282,7 +285,10 @@ const UpdateProfileUI: React.FC = () => {
       // Get token from cookie
       const token = getCookie('user_token');
 
-      const { newSkill: _, newQualification: __, ...dataToSend } = formData;
+      const { newSkill, newQualification, ...dataToSend } = formData;
+
+      void newSkill;
+      void newQualification;
 
       const requestBody = {
         name: dataToSend.fullName,
