@@ -192,7 +192,7 @@ const HowItWorks = () => {
           {/* Responsive Buttons Section */}
           <div className='flex flex-col sm:flex-row items-center justify-center gap-3 sm:gap-4 lg:gap-6'>
             <Link href='/find-freelancers' className='w-full sm:w-auto'>
-              <button className='w-full sm:w-auto button-gradient text-sm sm:text-base md:text-lg lg:text-xl px-6 sm:px-8 lg:px-10 py-3 sm:py-4 text-white rounded-md hover:brightness-110 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer flex items-center justify-center gap-2 md:gap-4'>
+              <button className='w-full sm:w-auto button-gradient text-sm sm:text-base md:text-lg lg:text-xl px-6 sm:px-8 lg:px-10 py-3 sm:py-4 text-white rounded-md hover:brightness-110 transition-all duration-300 font-semibold shadow-lg hover:shadow-xl transform hover:scale-105 cursor-pointer flex items-center justify-center gap-2 md:gap-4 bg-blue-600'>
                 Start as Client
                 <span className='text-white text-sm md:text-xl'>
                   <FaArrowRight />
